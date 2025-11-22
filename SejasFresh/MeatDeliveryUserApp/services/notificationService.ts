@@ -526,8 +526,11 @@ class NotificationService {
    */
   async clearAllNotifications(): Promise<{ success: boolean; message: string; data: { modifiedCount: number } }> {
     try {
-      const url = `${API_BASE_URL}/notifications/clear-all`;
+      // Ensure API_BASE_URL doesn't have trailing slash and construct URL explicitly
+      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+      const url = `${baseUrl}/notifications/clear-all`;
       console.log('🗑️ Clearing all notifications, URL:', url);
+      console.log('🗑️ API_BASE_URL:', API_BASE_URL);
       
       const headers = await this.getAuthHeaders();
       console.log('Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'none' });
