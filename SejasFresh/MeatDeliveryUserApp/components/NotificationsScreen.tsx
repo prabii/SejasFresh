@@ -391,12 +391,18 @@ const NotificationsScreen: React.FC = () => {
     }
   };
 
-  const renderNotificationItem = ({ item }: { item: NotificationItem }) => (
-    <NotificationItemCard 
-      item={item} 
-      onPress={handleNotificationPress}
-    />
-  );
+  const renderNotificationItem = ({ item, index }: { item: NotificationItem; index: number }) => {
+    // Ensure item has required properties
+    if (!item || (!item._id && !item.id)) {
+      return null;
+    }
+    return (
+      <NotificationItemCard 
+        item={item} 
+        onPress={handleNotificationPress}
+      />
+    );
+  };
 
   const renderSeparator = () => <View style={styles.separator} />;
 
