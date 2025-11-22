@@ -152,8 +152,11 @@ import Constants from 'expo-constants';
 const getApiUrl = () => {
   const extra = Constants.expoConfig?.extra;
   
-  if (__DEV__) {
-    // Development mode - use local server
+  // Use Render backend by default - only use local if explicitly enabled
+  const useLocalBackend = extra?.useLocalBackend === 'true';
+  
+  if (__DEV__ && useLocalBackend) {
+    // Development mode - use local server (only if explicitly enabled)
     // For mobile devices, use your computer's IP address instead of localhost
     // Example: http://192.168.1.100:5000/api
     // Or use the configured host from app.json
@@ -165,7 +168,7 @@ const getApiUrl = () => {
     // You can find it by running: ipconfig (Windows) or ifconfig (Mac/Linux)
     return `http://${apiHost}:${apiPort}/api`;
   } else {
-    // Production mode
+    // Production mode - use Render backend by default
     return extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api';
   }
 };

@@ -87,10 +87,11 @@
     },
     "extra": {
       "router": {},
-      "apiPort": "5000",
-      "apiHost": "192.168.1.5",
       "productionApiUrl": "https://meat-delivery-backend.onrender.com/api",
       "productionApiHost": "meat-delivery-backend.onrender.com",
+      "useLocalBackend": "false",
+      "apiPort": "5000",
+      "apiHost": "192.168.1.5",
       "eas": {
         "projectId": "01c9f98b-2648-4a98-ae4d-b6a9dee68d1b"
       }

@@ -4,16 +4,19 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 // Get API URL from app configuration
+// Use Render backend by default - only use local if explicitly enabled
 const getApiUrl = () => {
   const extra = Constants.expoConfig?.extra;
+  const useLocalBackend = extra?.useLocalBackend === 'true';
   
-  if (__DEV__) {
-    // Development mode - use local server
+  // Use Render backend by default, unless explicitly set to use local backend
+  if (__DEV__ && useLocalBackend) {
+    // Development mode - use local server (only if explicitly enabled)
     const apiHost = extra?.apiHost || '192.168.1.5';
     const apiPort = extra?.apiPort || '5000';
     return `http://${apiHost}:${apiPort}/api`;
   } else {
-    // Production mode - use production URL
+    // Production mode - use Render backend
     return extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api';
   }
 };
