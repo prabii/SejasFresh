@@ -8,7 +8,7 @@ const CONFIG = {
     API_PORT: Constants.expoConfig?.extra?.apiPort || '5000',
   },
   production: {
-    API_HOST: Constants.expoConfig?.extra?.productionApiHost || 'sejasfresh.cloud',
+    API_HOST: Constants.expoConfig?.extra?.productionApiHost || 'meat-delivery-backend.onrender.com',
     API_PORT: '443',
   },
 };
@@ -20,7 +20,7 @@ const currentConfig = isDevelopment ? CONFIG.development : CONFIG.production;
 // Build API URL
 const API_URL = isDevelopment 
   ? `http://${currentConfig.API_HOST}:${currentConfig.API_PORT}/api`
-  : Constants.expoConfig?.extra?.productionApiUrl || `https://${currentConfig.API_HOST}/api`;
+  : Constants.expoConfig?.extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api';
 
 export const API_CONFIG = {
   // API Base URL based on environment
@@ -77,7 +77,7 @@ export const ENV = {
     HOST: CONFIG.development.API_HOST,
   },
   production: {
-    API_URL: Constants.expoConfig?.extra?.productionApiUrl || `https://${CONFIG.production.API_HOST}/api`,
+    API_URL: Constants.expoConfig?.extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api',
     DEBUG: false,
     PORT: CONFIG.production.API_PORT,
     HOST: CONFIG.production.API_HOST,

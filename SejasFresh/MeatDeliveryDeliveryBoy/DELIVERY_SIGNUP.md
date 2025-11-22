@@ -58,8 +58,12 @@ This guide explains how to create delivery boy accounts for the delivery dashboa
 **Register Delivery User via API:**
 
 ```bash
-POST http://localhost:5000/api/auth/register
+# Production API
+POST https://meat-delivery-backend.onrender.com/api/auth/register
 Content-Type: application/json
+
+# Or for local development
+# POST http://localhost:5000/api/auth/register
 
 {
   "firstName": "John",
