@@ -56,11 +56,20 @@ export default function DashboardPage() {
   });
 
   const stats = {
-    total: orders?.length || 0,
-    pending: orders?.filter((o: any) => o.status === 'out-for-delivery').length || 0,
-    delivered: deliveredCount, // Use count from backend
-    preparing: orders?.filter((o: any) => o.status === 'preparing').length || 0,
+    total: Array.isArray(orders) ? orders.length : 0,
+    pending: Array.isArray(orders) ? orders.filter((o: any) => o.status === 'out-for-delivery').length : 0,
+    delivered: deliveredCount || 0, // Use count from backend
+    preparing: Array.isArray(orders) ? orders.filter((o: any) => o.status === 'preparing').length : 0,
   };
+  
+  // Debug logging
+  console.log('Dashboard Stats:', {
+    ordersData,
+    orders,
+    stats,
+    ordersError,
+    availableOrdersError,
+  });
 
   if (isLoading) {
     return (
