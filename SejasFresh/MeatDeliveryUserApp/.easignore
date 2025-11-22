@@ -1,0 +1,18 @@
+# Expo build caches
+.expo/
+.expo-shared/
+node_modules/
+dist/
+build/
+android/
+ios/
+.git/
+.gitignore
+*.log
+*.tmp
+.vscode/
+docs/
+*.md
+.env
+.env.*
+!.env.example
