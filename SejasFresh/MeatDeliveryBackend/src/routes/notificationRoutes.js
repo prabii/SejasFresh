@@ -20,11 +20,11 @@ router.use(protect);
 router.get('/', getNotifications);
 router.get('/unread-count', getUnreadCount);
 router.get('/preferences', getPreferences);
+router.patch('/read-all', markAllAsRead);
+router.delete('/clear-all', clearAllNotifications); // Must come before /:id route
 router.get('/:id', getNotificationById);
 router.patch('/:id/read', markAsRead);
-router.patch('/read-all', markAllAsRead);
 router.delete('/:id', deleteNotification);
-router.delete('/clear-all', clearAllNotifications);
 router.put('/preferences', updatePreferences);
 router.post('/welcome', sendWelcomeNotification);
 

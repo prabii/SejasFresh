@@ -24,15 +24,18 @@ const getApiUrl = () => {
 const API_BASE_URL = getApiUrl();
 
 // Configure how notifications are handled when received
-// This ensures notifications show even when app is in background or closed
+// This ensures notifications show as system notifications (like Snapchat)
 Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,      // Show alert even when app is in background
-    shouldPlaySound: true,       // Play sound
-    shouldSetBadge: true,        // Update badge count
-    shouldShowBanner: true,      // Show banner in foreground
-    shouldShowList: true,        // Show in notification list
-  }),
+  handleNotification: async (notification) => {
+    // Always show as system notification, even when app is closed
+    return {
+      shouldShowAlert: true,      // Show alert/system notification
+      shouldPlaySound: true,       // Play sound
+      shouldSetBadge: true,        // Update badge count
+      shouldShowBanner: true,      // Show banner in foreground
+      shouldShowList: true,        // Show in notification list/center
+    };
+  },
 });
 
 export interface NotificationItem {
@@ -160,8 +163,20 @@ class NotificationService {
       });
 
       // Create channels for different notification types
-      await Notifications.setNotificationChannelAsync('orders', {
+      await Notifications.setNotificationChannelAsync('order-updates', {
         name: 'Order Updates',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#D13635',
+        sound: 'default',
+        description: 'Notifications about your order status',
+        showBadge: true,
+        enableVibrate: true,
+        enableLights: true,
+      });
+
+      await Notifications.setNotificationChannelAsync('orders', {
+        name: 'Order Updates (Legacy)',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#D13635',

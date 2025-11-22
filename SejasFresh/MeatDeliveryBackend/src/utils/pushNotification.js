@@ -44,7 +44,24 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
         userId: userId.toString()
       },
       priority: 'high',
-      channelId: 'orders' // Android notification channel (matches app channel name)
+      channelId: 'order-updates', // Android notification channel
+      // Ensure notification shows as system notification
+      badge: 1,
+      // Android-specific options for system-level notifications
+      android: {
+        priority: 'high',
+        channelId: 'order-updates',
+        sound: 'default',
+        vibrate: [0, 250, 250, 250],
+        sticky: false,
+        visibility: 'public'
+      },
+      // iOS-specific options
+      ios: {
+        sound: 'default',
+        badge: 1,
+        _displayInForeground: true
+      }
     }];
 
     // Send the notification
