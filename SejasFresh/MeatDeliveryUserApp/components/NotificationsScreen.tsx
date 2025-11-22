@@ -483,11 +483,6 @@ const NotificationsScreen: React.FC = () => {
         maxToRenderPerBatch={10}
         windowSize={10}
         updateCellsBatchingPeriod={50}
-        getItemLayout={(data, index) => ({
-          length: 80,
-          offset: 80 * index,
-          index,
-        })}
       />
     </SafeAreaView>
   );
