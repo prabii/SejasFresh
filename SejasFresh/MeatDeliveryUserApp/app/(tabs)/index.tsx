@@ -26,6 +26,11 @@ import { useCart } from '../../contexts/CartContext';
 import { useNotificationContext } from '../../contexts/NotificationContext';
 import { Address, addressService } from "../../services/addressService";
 import { Product, productService } from "../../services/productService";
+import { cartService } from "../../services/cartService";
+import { orderService } from "../../services/orderService";
+import { notificationService } from "../../services/notificationService";
+import { couponService } from "../../services/couponService";
+import { authService } from "../../services/authService";
 
 
 
@@ -46,39 +51,20 @@ export default function HomeScreen() {
     // Fetch non-critical services in parallel without blocking UI
     const fetchAllServices = async () => {
       try {
-        const imports = await Promise.allSettled([
-          import('../../services/addressService'),
-          import('../../services/productService'),
-          import('../../services/cartService'),
-          import('../../services/orderService'),
-          import('../../services/notificationService'),
-          import('../../services/couponService'),
-          import('../../services/authService'),
-        ]);
-
-        // Kick off available services but don't await each to avoid blocking
-        imports.forEach((imp) => {
-          if (imp.status === 'fulfilled') {
-            const mod: any = (imp as any).value;
-            try {
-              // Call common exported methods if present
-              // Only call protected endpoints if authenticated
-              if (mod.addressService?.getSavedAddresses) mod.addressService.getSavedAddresses().catch(() => {});
-              if (mod.productService?.getAllProducts) mod.productService.getAllProducts().catch(() => {});
-              if (mod.cartService?.getCart) mod.cartService.getCart().catch(() => {});
-              // Protected endpoints - only call if authenticated
-              if (isAuthenticated) {
-                if (mod.orderService?.getUserOrders) mod.orderService.getUserOrders().catch(() => {});
-                if (mod.notificationService?.getNotifications) mod.notificationService.getNotifications().catch(() => {});
-                if (mod.couponService?.getActiveCoupons) mod.couponService.getActiveCoupons().catch(() => {});
-                if (mod.authService?.getMe) mod.authService.getMe().catch(() => {});
-              }
-            } catch (e) {
-              // Individual module invocation failed; silently ignore
-              // Don't log errors for unauthenticated users
-            }
-          }
-        });
+        // Use static imports - call services directly without dynamic imports
+        // Call common exported methods if present
+        // Only call protected endpoints if authenticated
+        addressService.getSavedAddresses().catch(() => {});
+        productService.getAllProducts().catch(() => {});
+        cartService.getCart().catch(() => {});
+        
+        // Protected endpoints - only call if authenticated
+        if (isAuthenticated) {
+          orderService.getUserOrders().catch(() => {});
+          notificationService.getNotifications().catch(() => {});
+          couponService.getActiveCoupons().catch(() => {});
+          authService.getMe().catch(() => {});
+        }
       } catch (error) {
         // Silently handle errors - don't show to user
         console.debug('Error fetching services:', error);
@@ -91,7 +77,6 @@ export default function HomeScreen() {
     const fetchAllAddresses = async () => {
       try {
         const API_BASE_URL = getCurrentConfig().API_URL;
-        const { authService } = await import('../../services/authService');
         const token = await authService.getToken();
         const headers = {
           'Content-Type': 'application/json',
@@ -299,7 +284,7 @@ export default function HomeScreen() {
   const handleAddInstantProductToCart = async (product: Product) => {
     try {
       // Add 1 quantity by default
-      await import('../../services/cartService').then(({ cartService }) => cartService.addToCart(product._id || product.id, 1));
+      cartService.addToCart(product._id || product.id, 1);
       incrementCartCount();
     } catch (error) {
       console.error('Failed to add to cart:', error);
