@@ -191,6 +191,17 @@ exports.deleteNotification = async (req, res, next) => {
 exports.clearAllNotifications = async (req, res, next) => {
   try {
     console.log('🗑️ Clear all notifications called for user:', req.user._id);
+    console.log('🗑️ Request method:', req.method);
+    console.log('🗑️ Request path:', req.path);
+    console.log('🗑️ Request originalUrl:', req.originalUrl);
+    
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized - User not authenticated'
+      });
+    }
+
     const result = await Notification.deleteMany({ user: req.user._id });
     console.log('✅ Cleared', result.deletedCount, 'notifications');
 

@@ -35,7 +35,11 @@ router.put('/preferences', updatePreferences);
 router.post('/welcome', sendWelcomeNotification);
 
 // DELETE routes - CRITICAL: /clear-all MUST come before /:id
-router.delete('/clear-all', clearAllNotifications);
+// Use exact match with no parameters
+router.delete('/clear-all', (req, res, next) => {
+  console.log('✅ Route /clear-all matched!');
+  clearAllNotifications(req, res, next);
+});
 
 // Parameterized routes come LAST (after all specific routes)
 router.get('/:id', getNotificationById);
