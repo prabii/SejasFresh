@@ -33,7 +33,7 @@ import {
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import api from '../services/api';
 
-const UPLOADS_URL = import.meta.env.VITE_UPLOADS_URL || 'http://localhost:5000/uploads';
+const UPLOADS_URL = import.meta.env.VITE_UPLOADS_URL || 'https://meat-delivery-backend.onrender.com/uploads';
 
 interface Product {
   _id: string;

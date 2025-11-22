@@ -9,12 +9,19 @@ Admin web dashboard for managing the Meat Delivery App built with **React + Type
 npm install
 ```
 
-### 2. Setup Environment Variables
-Create `.env.local`:
+### 2. Setup Environment Variables (Optional)
+Create `.env.local` to override defaults:
 ```env
+# For local development
 VITE_API_URL=http://localhost:5000/api
 VITE_UPLOADS_URL=http://localhost:5000/uploads
+
+# Or use production backend (default)
+# VITE_API_URL=https://meat-delivery-backend.onrender.com/api
+# VITE_UPLOADS_URL=https://meat-delivery-backend.onrender.com/uploads
 ```
+
+**Note**: By default, the app uses the production backend at `https://meat-delivery-backend.onrender.com`
 
 ### 3. Run Development Server
 ```bash

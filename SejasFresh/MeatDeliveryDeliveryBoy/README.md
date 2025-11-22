@@ -16,10 +16,16 @@ Web application for delivery personnel to manage assigned orders.
 npm install
 ```
 
-2. Create a `.env` file:
+2. Create a `.env` file (optional):
 ```
+# For local development
 VITE_API_URL=http://localhost:5000/api
+
+# Or use production backend (default)
+# VITE_API_URL=https://meat-delivery-backend.onrender.com/api
 ```
+
+**Note**: By default, the app uses the production backend at `https://meat-delivery-backend.onrender.com`
 
 3. Start development server:
 ```bash
