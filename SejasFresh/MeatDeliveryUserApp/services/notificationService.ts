@@ -192,8 +192,15 @@ class NotificationService {
         const projectId = '2ba16e37-acef-4bf5-a74b-ab54e880e43e'; // Your EAS project ID
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
         console.log('Push token:', token);
-      } catch (error) {
-        console.error('Error getting push token:', error);
+      } catch (error: any) {
+        // Fail gracefully - Firebase might not be configured yet
+        // This is expected if Firebase credentials aren't set up
+        if (error?.message?.includes('Firebase') || error?.message?.includes('FCM')) {
+          console.debug('Push notifications not configured (Firebase setup required):', error.message);
+        } else {
+          console.debug('Error getting push token:', error);
+        }
+        // Return null instead of throwing - app can work without push notifications
       }
     } else {
       console.log('Must use physical device for Push Notifications');

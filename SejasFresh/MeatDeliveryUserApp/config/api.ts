@@ -14,11 +14,13 @@ const CONFIG = {
 };
 
 // Get current environment (true for development, false for production)
+// Use production backend by default (Render) - override with app.json extra.apiHost for local dev
 const isDevelopment = __DEV__;
-const currentConfig = isDevelopment ? CONFIG.development : CONFIG.production;
+const useLocalBackend = Constants.expoConfig?.extra?.useLocalBackend === 'true';
+const currentConfig = isDevelopment && useLocalBackend ? CONFIG.development : CONFIG.production;
 
-// Build API URL
-const API_URL = isDevelopment 
+// Build API URL - Use Render backend by default, allow override for local development
+const API_URL = (isDevelopment && useLocalBackend)
   ? `http://${currentConfig.API_HOST}:${currentConfig.API_PORT}/api`
   : Constants.expoConfig?.extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api';
 
@@ -87,5 +89,11 @@ export const ENV = {
 // Get current environment configuration
 export const getCurrentConfig = () => {
   const isDevelopment = __DEV__; // React Native development flag
-  return isDevelopment ? ENV.development : ENV.production;
+  const useLocalBackend = Constants.expoConfig?.extra?.useLocalBackend === 'true';
+  
+  // Use production (Render) backend by default, unless explicitly set to use local
+  if (isDevelopment && useLocalBackend) {
+    return ENV.development;
+  }
+  return ENV.production;
 };

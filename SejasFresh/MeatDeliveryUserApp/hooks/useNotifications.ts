@@ -148,7 +148,8 @@ export function useNotifications() {
         // Only set error if we have permissions but still can't get token
         if (permissions.status === 'granted') {
           // This is unexpected - we have permissions but no token
-          console.debug('Failed to get push token despite granted permissions');
+          // Push token failed - likely Firebase not configured, fail gracefully
+          console.debug('Push notifications not available (Firebase setup may be required)');
           // Don't set error - might be simulator/emulator which is expected
         }
       }
