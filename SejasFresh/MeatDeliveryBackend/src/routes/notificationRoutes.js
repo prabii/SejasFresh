@@ -17,6 +17,20 @@ const { protect } = require('../middleware/auth');
 // All notification routes require authentication
 router.use(protect);
 
+// Debug middleware - log all requests
+router.use((req, res, next) => {
+  if (req.method === 'DELETE' && req.path.includes('clear')) {
+    console.log('🔍 DELETE request to notifications:', {
+      method: req.method,
+      path: req.path,
+      originalUrl: req.originalUrl,
+      baseUrl: req.baseUrl,
+      url: req.url
+    });
+  }
+  next();
+});
+
 // IMPORTANT: Specific routes MUST come before parameterized routes
 // Express matches routes in order, so exact matches must be first
 

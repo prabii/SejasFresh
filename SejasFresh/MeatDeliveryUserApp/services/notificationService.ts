@@ -130,6 +130,10 @@ class NotificationService {
       data = await response.json();
     } catch (jsonError) {
       console.error('Failed to parse JSON response:', jsonError);
+      // If it's a 404, provide more helpful error message
+      if (response.status === 404) {
+        throw new Error(`Route not found (404). The endpoint may not be deployed yet on Render.`);
+      }
       throw new Error(`Network error: ${response.status} ${response.statusText}`);
     }
     
@@ -139,6 +143,12 @@ class NotificationService {
         statusText: response.statusText,
         data: data
       });
+      
+      // Provide more helpful error for 404
+      if (response.status === 404) {
+        throw new Error(data.message || `Route not found (404). Please ensure the backend is deployed with the latest code on Render.`);
+      }
+      
       throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
     }
     
