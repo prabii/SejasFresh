@@ -180,9 +180,19 @@ const NotificationsScreen: React.FC = () => {
         const newNotifications = response.data?.data || [];
         
         if (append && page > 1) {
-          setNotifications(prev => [...(prev || []), ...newNotifications]);
+          setNotifications(prev => {
+            // Filter out duplicates and ensure all items have _id
+            const existingIds = new Set((prev || []).map(n => n._id || n.id).filter(Boolean));
+            const uniqueNew = newNotifications.filter(n => {
+              const id = n._id || n.id;
+              return id && !existingIds.has(id);
+            });
+            return [...(prev || []), ...uniqueNew];
+          });
         } else {
-          setNotifications(newNotifications);
+          // Ensure all notifications have valid IDs
+          const validNotifications = newNotifications.filter(n => n._id || n.id);
+          setNotifications(validNotifications);
         }
         
         // Calculate hasMoreData based on pagination
@@ -442,7 +452,7 @@ const NotificationsScreen: React.FC = () => {
       <FlatList
         data={notifications || []}
         renderItem={renderNotificationItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item, index) => item._id || item.id || `notification-${index}`}
         ItemSeparatorComponent={renderSeparator}
         ListEmptyComponent={renderEmptyState}
         ListFooterComponent={renderFooter}
@@ -462,6 +472,16 @@ const NotificationsScreen: React.FC = () => {
         }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
+        removeClippedSubviews={false}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        updateCellsBatchingPeriod={50}
+        getItemLayout={(data, index) => ({
+          length: 80,
+          offset: 80 * index,
+          index,
+        })}
       />
     </SafeAreaView>
   );
