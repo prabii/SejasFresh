@@ -35,6 +35,7 @@ import {
   LocalShipping as ShippingIcon,
 } from '@mui/icons-material';
 import api from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Order {
   _id: string;
@@ -79,32 +80,57 @@ export default function OrdersPage() {
   const [tabValue, setTabValue] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const { data: ordersData, isLoading } = useQuery({
+  const { isAuthenticated } = useAuth();
+
+  const { data: ordersData, isLoading, error: ordersError } = useQuery({
     queryKey: ['delivery-orders'],
     queryFn: async () => {
-      const response = await api.get('/delivery/orders');
-      return response.data;
+      try {
+        const response = await api.get('/delivery/orders');
+        console.log('Delivery orders response:', response.data);
+        return response.data;
+      } catch (error: any) {
+        console.error('Error fetching delivery orders:', error);
+        throw error;
+      }
     },
+    enabled: isAuthenticated, // Only fetch when authenticated
+    retry: 1,
   });
 
   const orders = (ordersData?.data || []) as Order[];
 
   // Get delivered orders history
-  const { data: deliveredOrders, isLoading: isLoadingDelivered } = useQuery<Order[]>({
+  const { data: deliveredOrders, isLoading: isLoadingDelivered, error: deliveredError } = useQuery<Order[]>({
     queryKey: ['delivered-orders'],
     queryFn: async () => {
-      const response = await api.get('/delivery/orders/delivered');
-      return response.data.data || [];
+      try {
+        const response = await api.get('/delivery/orders/delivered');
+        console.log('Delivered orders response:', response.data);
+        return response.data.data || [];
+      } catch (error: any) {
+        console.error('Error fetching delivered orders:', error);
+        throw error;
+      }
     },
-    enabled: tabValue === 2, // Only fetch when on delivered tab
+    enabled: isAuthenticated && tabValue === 2, // Only fetch when authenticated and on delivered tab
+    retry: 1,
   });
 
-  const { data: availableOrders, isLoading: isLoadingAvailable } = useQuery<Order[]>({
+  const { data: availableOrders, isLoading: isLoadingAvailable, error: availableError } = useQuery<Order[]>({
     queryKey: ['available-orders'],
     queryFn: async () => {
-      const response = await api.get('/delivery/orders/available');
-      return response.data.data || [];
+      try {
+        const response = await api.get('/delivery/orders/available');
+        console.log('Available orders response:', response.data);
+        return response.data.data || [];
+      } catch (error: any) {
+        console.error('Error fetching available orders:', error);
+        throw error;
+      }
     },
+    enabled: isAuthenticated, // Only fetch when authenticated
+    retry: 1,
   });
 
   const acceptOrderMutation = useMutation({

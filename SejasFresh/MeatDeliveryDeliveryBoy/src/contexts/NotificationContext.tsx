@@ -30,14 +30,23 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  
+  // Check if user is authenticated
+  const token = typeof window !== 'undefined' ? localStorage.getItem('delivery_token') : null;
+  const isAuthenticated = !!token;
 
-  const { data, refetch } = useQuery({
+  const { data, refetch, error } = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
       try {
         const response = await api.get('/notifications');
+        console.log('Notifications response:', response.data);
         // Handle different response structures
-        if (response.data?.data?.data) {
+        if (response.data?.success && response.data?.data?.data) {
+          return response.data.data.data; // Nested structure
+        } else if (response.data?.success && response.data?.data) {
+          return Array.isArray(response.data.data) ? response.data.data : [];
+        } else if (response.data?.data?.data) {
           return response.data.data.data; // Nested structure
         } else if (response.data?.data) {
           return Array.isArray(response.data.data) ? response.data.data : [];
@@ -45,16 +54,22 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
           return response.data;
         }
         return [];
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching notifications:', error);
+        // Don't throw - return empty array to prevent query failure
         return [];
       }
     },
+    enabled: isAuthenticated, // Only fetch when authenticated
     refetchInterval: 60000, // Poll every 60 seconds (reduced frequency)
     refetchOnWindowFocus: false, // Prevent refetch on window focus
     refetchOnReconnect: false, // Prevent refetch on reconnect
     retry: 1,
   });
+  
+  if (error) {
+    console.error('Notifications query error:', error);
+  }
 
   useEffect(() => {
     if (data && Array.isArray(data)) {

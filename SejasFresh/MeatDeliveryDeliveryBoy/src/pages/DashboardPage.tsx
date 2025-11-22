@@ -18,25 +18,41 @@ import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  const { data: ordersData, isLoading } = useQuery({
+  const { data: ordersData, isLoading, error: ordersError } = useQuery({
     queryKey: ['delivery-orders'],
     queryFn: async () => {
-      const response = await api.get('/delivery/orders');
-      return response.data;
+      try {
+        const response = await api.get('/delivery/orders');
+        console.log('Delivery orders response:', response.data);
+        return response.data;
+      } catch (error: any) {
+        console.error('Error fetching delivery orders:', error);
+        throw error;
+      }
     },
+    enabled: isAuthenticated, // Only fetch when authenticated
+    retry: 1,
   });
 
   const orders = ordersData?.data || [];
   const deliveredCount = ordersData?.stats?.delivered || 0;
 
-  const { data: availableOrders } = useQuery({
+  const { data: availableOrders, error: availableOrdersError } = useQuery({
     queryKey: ['available-orders'],
     queryFn: async () => {
-      const response = await api.get('/delivery/orders/available');
-      return response.data.data || [];
+      try {
+        const response = await api.get('/delivery/orders/available');
+        console.log('Available orders response:', response.data);
+        return response.data.data || [];
+      } catch (error: any) {
+        console.error('Error fetching available orders:', error);
+        throw error;
+      }
     },
+    enabled: isAuthenticated, // Only fetch when authenticated
+    retry: 1,
   });
 
   const stats = {
@@ -52,6 +68,14 @@ export default function DashboardPage() {
         <CircularProgress />
       </Box>
     );
+  }
+
+  // Show error messages if API calls failed
+  if (ordersError) {
+    console.error('Orders error:', ordersError);
+  }
+  if (availableOrdersError) {
+    console.error('Available orders error:', availableOrdersError);
   }
 
   return (
