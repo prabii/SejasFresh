@@ -166,7 +166,7 @@ const getApiUrl = () => {
     return `http://${apiHost}:${apiPort}/api`;
   } else {
     // Production mode
-    return extra?.productionApiUrl || 'https://sejasfresh.cloud/api';
+    return extra?.productionApiUrl || 'https://meat-delivery-backend.onrender.com/api';
   }
 };
 
