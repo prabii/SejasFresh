@@ -44,7 +44,7 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
         userId: userId.toString()
       },
       priority: 'high',
-      channelId: 'order-updates' // Android notification channel
+      channelId: 'orders' // Android notification channel (matches app channel name)
     }];
 
     // Send the notification
