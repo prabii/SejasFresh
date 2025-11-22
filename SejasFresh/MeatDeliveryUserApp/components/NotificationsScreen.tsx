@@ -24,7 +24,19 @@ interface NotificationsHeaderProps {
   isLoading: boolean;
 }
 
-const NotificationsHeader: React.FC<NotificationsHeaderProps> = ({ onMarkAllRead, isLoading }) => {
+interface NotificationsHeaderProps {
+  onMarkAllRead: () => void;
+  onClearAll: () => void;
+  isLoading: boolean;
+  isClearing: boolean;
+}
+
+const NotificationsHeader: React.FC<NotificationsHeaderProps> = ({ 
+  onMarkAllRead, 
+  onClearAll,
+  isLoading, 
+  isClearing 
+}) => {
   const router = useRouter();
 
   const handleBack = () => {
@@ -39,15 +51,27 @@ const NotificationsHeader: React.FC<NotificationsHeaderProps> = ({ onMarkAllRead
       
       <Text style={styles.headerTitle}>Notifications</Text>
       
-      <TouchableOpacity 
-        onPress={onMarkAllRead}
-        disabled={isLoading}
-        style={[styles.markAllReadButton, isLoading && styles.disabledButton]}
-      >
-        <Text style={[styles.markAllReadText, isLoading && styles.disabledText]}>
-          Mark all read
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.headerActions}>
+        <TouchableOpacity 
+          onPress={onClearAll}
+          disabled={isClearing || isLoading}
+          style={[styles.clearAllButton, (isClearing || isLoading) && styles.disabledButton]}
+        >
+          <Text style={[styles.clearAllText, (isClearing || isLoading) && styles.disabledText]}>
+            Clear All
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          onPress={onMarkAllRead}
+          disabled={isLoading || isClearing}
+          style={[styles.markAllReadButton, (isLoading || isClearing) && styles.disabledButton]}
+        >
+          <Text style={[styles.markAllReadText, (isLoading || isClearing) && styles.disabledText]}>
+            Mark all read
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -132,6 +156,7 @@ const NotificationsScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [markingAllRead, setMarkingAllRead] = useState(false);
+  const [clearingAll, setClearingAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreData, setHasMoreData] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -391,6 +416,28 @@ const NotificationsScreen: React.FC = () => {
     }
   };
 
+  const handleClearAll = async () => {
+    try {
+      setClearingAll(true);
+      const response = await notificationService.clearAllNotifications();
+      
+      if (response.success) {
+        // Clear all notifications from state
+        setNotifications([]);
+        setCurrentPage(1);
+        setHasMoreData(false);
+        showSuccess('All notifications cleared');
+      } else {
+        showError('Failed to clear all notifications');
+      }
+    } catch (error: any) {
+      console.error('Error clearing all notifications:', error);
+      showError(error.message || 'Failed to clear all notifications');
+    } finally {
+      setClearingAll(false);
+    }
+  };
+
   const renderNotificationItem = ({ item, index }: { item: NotificationItem; index: number }) => {
     // Ensure item has required properties
     if (!item || (!item._id && !item.id)) {
@@ -451,7 +498,9 @@ const NotificationsScreen: React.FC = () => {
       {/* Header */}
       <NotificationsHeader 
         onMarkAllRead={handleMarkAllRead}
+        onClearAll={handleClearAll}
         isLoading={markingAllRead}
+        isClearing={clearingAll}
       />
       
       {/* Notifications List */}
@@ -514,6 +563,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
+    flex: 1,
+    textAlign: 'center',
+  },
+
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
 
   markAllReadText: {
@@ -523,6 +580,16 @@ const styles = StyleSheet.create({
   },
 
   markAllReadButton: {
+    padding: 4,
+  },
+
+  clearAllText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
+  },
+
+  clearAllButton: {
     padding: 4,
   },
 

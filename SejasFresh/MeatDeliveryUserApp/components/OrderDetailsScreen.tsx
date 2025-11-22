@@ -12,6 +12,7 @@ import {
     ActivityIndicator,
     RefreshControl,
     Linking,
+    Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,6 +32,7 @@ const OrderDetailsScreen: React.FC = () => {
   const { orderData } = useLocalSearchParams();
   const [order, setOrder] = useState<Order | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // Parse initial order data from params
   useEffect(() => {
@@ -93,6 +95,57 @@ const OrderDetailsScreen: React.FC = () => {
   // Handle back navigation
   const handleBack = () => {
     router.back();
+  };
+
+  // Handle cancel order
+  const handleCancelOrder = () => {
+    if (!order) return;
+
+    // Check if order can be cancelled
+    if (order.status === 'delivered' || order.status === 'cancelled') {
+      Alert.alert(
+        'Cannot Cancel',
+        `This order cannot be cancelled because it is already ${order.status}.`
+      );
+      return;
+    }
+
+    Alert.alert(
+      'Cancel Order',
+      `Are you sure you want to cancel order #${order.orderNumber}?`,
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes, Cancel',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsCancelling(true);
+              await orderService.cancelOrder(order._id, 'Cancelled by customer');
+              
+              // Refresh order to get updated status
+              const response = await orderService.getOrderById(order._id);
+              if (response.success && response.data) {
+                setOrder(response.data);
+              }
+              
+              Alert.alert('Success', 'Order has been cancelled successfully.');
+            } catch (error: any) {
+              console.error('Error cancelling order:', error);
+              Alert.alert(
+                'Error',
+                error.message || 'Failed to cancel order. Please try again.'
+              );
+            } finally {
+              setIsCancelling(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   // Get status color
@@ -338,6 +391,26 @@ const OrderDetailsScreen: React.FC = () => {
                 {getDeliveryStatusMessage(order.status)}
               </Text>
             </View>
+          )}
+
+          {/* Cancel Order Button */}
+          {order.status !== 'delivered' && 
+           order.status !== 'cancelled' && 
+           order.status !== 'out-for-delivery' && (
+            <TouchableOpacity
+              style={[styles.cancelOrderButton, isCancelling && styles.cancelOrderButtonDisabled]}
+              onPress={handleCancelOrder}
+              disabled={isCancelling}
+            >
+              {isCancelling ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <>
+                  <Ionicons name="close-circle-outline" size={20} color="white" />
+                  <Text style={styles.cancelOrderButtonText}>Cancel Order</Text>
+                </>
+              )}
+            </TouchableOpacity>
           )}
         </View>
 

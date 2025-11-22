@@ -24,12 +24,14 @@ const getApiUrl = () => {
 const API_BASE_URL = getApiUrl();
 
 // Configure how notifications are handled when received
+// This ensures notifications show even when app is in background or closed
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
+    shouldShowAlert: true,      // Show alert even when app is in background
+    shouldPlaySound: true,       // Play sound
+    shouldSetBadge: true,        // Update badge count
+    shouldShowBanner: true,      // Show banner in foreground
+    shouldShowList: true,        // Show in notification list
   }),
 });
 
@@ -158,7 +160,6 @@ class NotificationService {
       });
 
       // Create channels for different notification types
-      // Create 'orders' channel for order-related notifications
       await Notifications.setNotificationChannelAsync('orders', {
         name: 'Order Updates',
         importance: Notifications.AndroidImportance.MAX,
@@ -166,18 +167,6 @@ class NotificationService {
         lightColor: '#D13635',
         sound: 'default',
         description: 'Notifications about your order status',
-        showBadge: true,
-      });
-
-      // Also create 'order-updates' channel as alias (for backward compatibility)
-      await Notifications.setNotificationChannelAsync('order-updates', {
-        name: 'Order Updates',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#D13635',
-        sound: 'default',
-        description: 'Notifications about your order status',
-        showBadge: true,
       });
 
       await Notifications.setNotificationChannelAsync('promotions', {
@@ -205,7 +194,7 @@ class NotificationService {
       }
       
       try {
-        const projectId = Constants.expoConfig?.extra?.eas?.projectId || '01c9f98b-2648-4a98-ae4d-b6a9dee68d1b'; // Use project ID from app.json
+        const projectId = '2ba16e37-acef-4bf5-a74b-ab54e880e43e'; // Your EAS project ID
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
         console.log('Push token:', token);
       } catch (error: any) {
