@@ -123,7 +123,10 @@ exports.createOrder = async (req, res, next) => {
       },
       appliedCoupon: userCart && userCart.appliedCoupon ? userCart.appliedCoupon._id : null,
       paymentInfo: {
-        method: paymentMethod || 'cash-on-delivery'
+        method: paymentMethod || 'cash-on-delivery',
+        // For online/card payments, mark as paid immediately
+        // For cash-on-delivery, keep as pending until delivered
+        status: (paymentMethod === 'online' || paymentMethod === 'card') ? 'paid' : 'pending'
       },
       specialInstructions,
       statusHistory: [{
@@ -339,6 +342,11 @@ exports.updateOrderStatus = async (req, res, next) => {
       timestamp: new Date(),
       notes: notes || `Status updated to ${status}`
     });
+
+    // Update payment status based on order status
+    if (status === 'delivered' && order.paymentInfo && order.paymentInfo.method === 'cash-on-delivery' && order.paymentInfo.status === 'pending') {
+      order.paymentInfo.status = 'paid';
+    }
 
     await order.save();
 

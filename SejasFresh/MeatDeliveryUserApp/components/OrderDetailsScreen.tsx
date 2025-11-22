@@ -99,8 +99,11 @@ const OrderDetailsScreen: React.FC = () => {
   const getStatusColor = (status: string): string => {
     switch (status.toLowerCase()) {
       case 'delivered':
+      case 'paid':
         return GREEN_COLOR;
       case 'cancelled':
+      case 'failed':
+      case 'refunded':
         return PRIMARY_RED;
       case 'pending':
         return YELLOW_COLOR;
@@ -425,14 +428,33 @@ const OrderDetailsScreen: React.FC = () => {
                 </Text>
               </View>
             )}
-            {order.paymentInfo.status && (
-              <View style={styles.paymentRow}>
-                <Text style={styles.paymentLabel}>Status:</Text>
-                <Text style={[styles.paymentValue, { color: getStatusColor(order.paymentInfo.status) }]}>
-                  {order.paymentInfo.status.charAt(0).toUpperCase() + order.paymentInfo.status.slice(1)}
-                </Text>
-              </View>
-            )}
+            {(() => {
+              // Calculate payment status based on order status and payment method
+              let paymentStatus = order.paymentInfo.status;
+              
+              // If payment status is missing or incorrect, calculate it
+              if (!paymentStatus || paymentStatus === 'pending') {
+                const paymentMethod = order.paymentInfo.method || 'cash-on-delivery';
+                const orderStatus = order.status || 'pending';
+                
+                if (paymentMethod === 'cash-on-delivery') {
+                  // COD: paid when delivered, pending otherwise
+                  paymentStatus = orderStatus === 'delivered' ? 'paid' : 'pending';
+                } else if (paymentMethod === 'online' || paymentMethod === 'card') {
+                  // Online/Card: paid when order is confirmed or later
+                  paymentStatus = (orderStatus === 'pending') ? 'pending' : 'paid';
+                }
+              }
+              
+              return (
+                <View style={styles.paymentRow}>
+                  <Text style={styles.paymentLabel}>Status:</Text>
+                  <Text style={[styles.paymentValue, { color: getStatusColor(paymentStatus) }]}>
+                    {paymentStatus.charAt(0).toUpperCase() + paymentStatus.slice(1)}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
         )}
 

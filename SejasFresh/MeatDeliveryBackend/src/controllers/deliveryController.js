@@ -254,6 +254,11 @@ exports.updateDeliveryOrderStatus = async (req, res, next) => {
       notes: 'Order delivered by delivery agent'
     });
 
+    // Update payment status to 'paid' for cash-on-delivery orders when delivered
+    if (order.paymentInfo && order.paymentInfo.method === 'cash-on-delivery' && order.paymentInfo.status === 'pending') {
+      order.paymentInfo.status = 'paid';
+    }
+
     await order.save();
 
     // Create notification for customer
