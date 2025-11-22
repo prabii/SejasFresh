@@ -209,8 +209,9 @@ class NotificationService {
       }
       
       try {
-        const projectId = '2ba16e37-acef-4bf5-a74b-ab54e880e43e'; // Your EAS project ID
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId || '01c9f98b-2648-4a98-ae4d-b6a9dee68d1b';
         token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+        console.log('✅ Push token obtained:', token);
         console.log('Push token:', token);
       } catch (error: any) {
         // Fail gracefully - Firebase might not be configured yet
