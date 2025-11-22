@@ -17,15 +17,27 @@ const { protect } = require('../middleware/auth');
 // All notification routes require authentication
 router.use(protect);
 
-// Specific routes must come before parameterized routes
+// IMPORTANT: Specific routes MUST come before parameterized routes
+// Express matches routes in order, so exact matches must be first
+
+// GET routes - specific first
 router.get('/unread-count', getUnreadCount);
 router.get('/preferences', getPreferences);
-router.patch('/read-all', markAllAsRead);
-router.delete('/clear-all', clearAllNotifications); // Must come before /:id route
-router.put('/preferences', updatePreferences);
-router.post('/welcome', sendWelcomeNotification);
 router.get('/', getNotifications);
-// Parameterized routes come last
+
+// PATCH routes - specific first
+router.patch('/read-all', markAllAsRead);
+
+// PUT routes
+router.put('/preferences', updatePreferences);
+
+// POST routes
+router.post('/welcome', sendWelcomeNotification);
+
+// DELETE routes - CRITICAL: /clear-all MUST come before /:id
+router.delete('/clear-all', clearAllNotifications);
+
+// Parameterized routes come LAST (after all specific routes)
 router.get('/:id', getNotificationById);
 router.patch('/:id/read', markAsRead);
 router.delete('/:id', deleteNotification);
