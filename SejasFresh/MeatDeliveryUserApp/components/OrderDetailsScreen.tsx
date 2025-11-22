@@ -960,6 +960,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
+
+  // Cancel Order Button Styles
+  cancelOrderButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: PRIMARY_RED,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 16,
+    gap: 8,
+  },
+
+  cancelOrderButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  cancelOrderButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 export default OrderDetailsScreen;
