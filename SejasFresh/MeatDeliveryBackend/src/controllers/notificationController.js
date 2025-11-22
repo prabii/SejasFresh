@@ -45,7 +45,16 @@ exports.getNotifications = async (req, res, next) => {
 // @access  Private
 exports.getNotificationById = async (req, res, next) => {
   try {
-    const notification = await Notification.findById(req.params.id);
+    // Validate that id is a valid ObjectId (not a string like "clear-all")
+    const id = req.params.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid notification ID'
+      });
+    }
+
+    const notification = await Notification.findById(id);
 
     if (!notification || notification.user.toString() !== req.user._id.toString()) {
       return res.status(404).json({
@@ -68,7 +77,16 @@ exports.getNotificationById = async (req, res, next) => {
 // @access  Private
 exports.markAsRead = async (req, res, next) => {
   try {
-    const notification = await Notification.findById(req.params.id);
+    // Validate that id is a valid ObjectId (not a string like "clear-all")
+    const id = req.params.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid notification ID'
+      });
+    }
+
+    const notification = await Notification.findById(id);
 
     if (!notification || notification.user.toString() !== req.user._id.toString()) {
       return res.status(404).json({
