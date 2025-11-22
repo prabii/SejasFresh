@@ -162,7 +162,9 @@ exports.deleteNotification = async (req, res, next) => {
 // @access  Private
 exports.clearAllNotifications = async (req, res, next) => {
   try {
+    console.log('🗑️ Clear all notifications called for user:', req.user._id);
     const result = await Notification.deleteMany({ user: req.user._id });
+    console.log('✅ Cleared', result.deletedCount, 'notifications');
 
     res.json({
       success: true,
@@ -172,6 +174,7 @@ exports.clearAllNotifications = async (req, res, next) => {
       }
     });
   } catch (error) {
+    console.error('❌ Error clearing all notifications:', error);
     next(error);
   }
 };

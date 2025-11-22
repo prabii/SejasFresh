@@ -516,14 +516,24 @@ class NotificationService {
    */
   async clearAllNotifications(): Promise<{ success: boolean; message: string; data: { modifiedCount: number } }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/notifications/clear-all`, {
+      const url = `${API_BASE_URL}/notifications/clear-all`;
+      console.log('🗑️ Clearing all notifications, URL:', url);
+      
+      const headers = await this.getAuthHeaders();
+      console.log('Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'none' });
+      
+      const response = await fetch(url, {
         method: 'DELETE',
-        headers: await this.getAuthHeaders(),
+        headers: headers,
       });
 
-      return await this.handleResponse(response);
+      console.log('Clear all response status:', response.status, response.statusText);
+      
+      const result = await this.handleResponse(response);
+      console.log('Clear all result:', result);
+      return result;
     } catch (error) {
-      console.error('Error clearing all notifications:', error);
+      console.error('❌ Error clearing all notifications:', error);
       throw error;
     }
   }
