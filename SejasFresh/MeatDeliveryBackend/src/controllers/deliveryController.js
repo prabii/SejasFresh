@@ -179,28 +179,56 @@ exports.acceptOrder = async (req, res, next) => {
     // Populate delivery agent info for notification
     await order.populate('assignedTo', 'firstName lastName phone');
 
-    // Create notification for customer
+    // Create notification and send push notification for customer
     if (order.customer && order.customer._id) {
-      const deliveryAgent = order.assignedTo;
-      await Notification.create({
-        user: order.customer._id,
-        recipient: order.customer._id, // Support both fields for compatibility
-        title: 'Order Out for Delivery! 🚚',
-        message: `Your order #${order.orderNumber} is on the way! Delivery agent: ${deliveryAgent.firstName} ${deliveryAgent.lastName} (${deliveryAgent.phone})`,
-        type: 'order',
-        category: 'order',
-        priority: 'high',
-        metadata: {
-          orderId: order._id.toString(),
-          orderNumber: order.orderNumber,
-          screen: 'order-details',
-          status: 'out-for-delivery',
-          deliveryAgent: {
-            name: `${deliveryAgent.firstName} ${deliveryAgent.lastName}`,
-            phone: deliveryAgent.phone
+      try {
+        const { sendPushNotification } = require('../utils/pushNotification');
+        const deliveryAgent = order.assignedTo;
+        
+        const title = 'Order Out for Delivery! 🚚';
+        const message = `Your order #${order.orderNumber} is on the way! Delivery agent: ${deliveryAgent.firstName} ${deliveryAgent.lastName} (${deliveryAgent.phone})`;
+        
+        await Notification.create({
+          user: order.customer._id,
+          recipient: order.customer._id, // Support both fields for compatibility
+          title,
+          message,
+          type: 'order',
+          category: 'order',
+          priority: 'high',
+          metadata: {
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'out-for-delivery',
+            deliveryAgent: {
+              name: `${deliveryAgent.firstName} ${deliveryAgent.lastName}`,
+              phone: deliveryAgent.phone
+            }
           }
-        }
-      });
+        });
+
+        // Send push notification
+        await sendPushNotification(
+          order.customer._id,
+          title,
+          message,
+          {
+            type: 'order',
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'out-for-delivery',
+            deliveryAgent: {
+              name: `${deliveryAgent.firstName} ${deliveryAgent.lastName}`,
+              phone: deliveryAgent.phone
+            }
+          }
+        );
+      } catch (notificationError) {
+        // Log error but don't fail the order acceptance
+        console.error('Error sending delivery acceptance notification:', notificationError);
+      }
     }
 
     res.json({
@@ -261,23 +289,47 @@ exports.updateDeliveryOrderStatus = async (req, res, next) => {
 
     await order.save();
 
-    // Create notification for customer
+    // Create notification and send push notification for customer
     if (order.customer && order.customer._id) {
-      await Notification.create({
-        user: order.customer._id,
-        recipient: order.customer._id, // Support both fields for compatibility
-        title: 'Order Delivered! ✅',
-        message: `Your order #${order.orderNumber} has been delivered successfully. Thank you for your order!`,
-        type: 'order',
-        category: 'order',
-        priority: 'high',
-        metadata: {
-          orderId: order._id.toString(),
-          orderNumber: order.orderNumber,
-          screen: 'order-details',
-          status: 'delivered'
-        }
-      });
+      try {
+        const { sendPushNotification } = require('../utils/pushNotification');
+        
+        const title = 'Order Delivered! ✅';
+        const message = `Your order #${order.orderNumber} has been delivered successfully. Thank you for your order!`;
+        
+        await Notification.create({
+          user: order.customer._id,
+          recipient: order.customer._id, // Support both fields for compatibility
+          title,
+          message,
+          type: 'order',
+          category: 'order',
+          priority: 'high',
+          metadata: {
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'delivered'
+          }
+        });
+
+        // Send push notification
+        await sendPushNotification(
+          order.customer._id,
+          title,
+          message,
+          {
+            type: 'order',
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'delivered'
+          }
+        );
+      } catch (notificationError) {
+        // Log error but don't fail the status update
+        console.error('Error sending delivery notification:', notificationError);
+      }
     }
 
     res.json({

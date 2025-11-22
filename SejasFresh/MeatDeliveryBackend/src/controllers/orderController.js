@@ -161,13 +161,18 @@ exports.createOrder = async (req, res, next) => {
       await userCart.save();
     }
 
-    // Create notification for order placement
+    // Create notification and send push notification for order placement
     try {
       const Notification = require('../models/Notification');
+      const { sendPushNotification } = require('../utils/pushNotification');
+      
+      const title = 'Order Placed Successfully! 🎉';
+      const message = `Your order #${order.orderNumber} has been placed. We'll notify you when it's confirmed.`;
+      
       await Notification.create({
         user: req.user._id,
-        title: 'Order Placed Successfully! 🎉',
-        message: `Your order #${order.orderNumber} has been placed. We'll notify you when it's confirmed.`,
+        title,
+        message,
         type: 'order',
         category: 'order',
         priority: 'high',
@@ -177,9 +182,22 @@ exports.createOrder = async (req, res, next) => {
           screen: 'order-details'
         }
       });
+
+      // Send push notification
+      await sendPushNotification(
+        req.user._id,
+        title,
+        message,
+        {
+          type: 'order',
+          orderId: order._id.toString(),
+          orderNumber: order.orderNumber,
+          screen: 'order-details'
+        }
+      );
     } catch (notificationError) {
       // Log error but don't fail the order creation
-      console.error('Error creating order notification:', notificationError);
+      console.error('Error sending order placement notification:', notificationError);
     }
 
     await order.populate('customer', 'firstName lastName email phone');
@@ -303,6 +321,7 @@ exports.cancelOrder = async (req, res, next) => {
       });
     }
 
+    const oldStatus = order.status;
     order.status = 'cancelled';
     order.statusHistory.push({
       status: 'cancelled',
@@ -311,6 +330,50 @@ exports.cancelOrder = async (req, res, next) => {
     });
 
     await order.save();
+
+    // Send push notification for order cancellation
+    if (oldStatus !== 'cancelled') {
+      try {
+        const Notification = require('../models/Notification');
+        const { sendPushNotification } = require('../utils/pushNotification');
+        
+        const title = 'Order Cancelled';
+        const message = `Your order #${order.orderNumber} has been cancelled.${reason ? ` Reason: ${reason}` : ''}`;
+        
+        await Notification.create({
+          user: req.user._id,
+          recipient: req.user._id,
+          title,
+          message,
+          type: 'order',
+          category: 'order',
+          priority: 'high',
+          metadata: {
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'cancelled'
+          }
+        });
+
+        // Send push notification
+        await sendPushNotification(
+          req.user._id,
+          title,
+          message,
+          {
+            type: 'order',
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: 'cancelled'
+          }
+        );
+      } catch (notificationError) {
+        // Log error but don't fail the cancellation
+        console.error('Error sending cancellation notification:', notificationError);
+      }
+    }
 
     res.json({
       success: true,
@@ -327,7 +390,7 @@ exports.cancelOrder = async (req, res, next) => {
 exports.updateOrderStatus = async (req, res, next) => {
   try {
     const { status, notes } = req.body;
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate('customer', '_id firstName lastName');
 
     if (!order) {
       return res.status(404).json({
@@ -336,6 +399,7 @@ exports.updateOrderStatus = async (req, res, next) => {
       });
     }
 
+    const oldStatus = order.status;
     order.status = status;
     order.statusHistory.push({
       status,
@@ -349,6 +413,84 @@ exports.updateOrderStatus = async (req, res, next) => {
     }
 
     await order.save();
+
+    // Send push notification if status changed and customer exists
+    if (oldStatus !== status && order.customer && order.customer._id) {
+      try {
+        const { sendPushNotification } = require('../utils/pushNotification');
+        const Notification = require('../models/Notification');
+        
+        // Get status-specific message
+        let title = '';
+        let message = '';
+        let priority = 'medium';
+        
+        switch (status) {
+          case 'confirmed':
+            title = 'Order Confirmed! ✅';
+            message = `Your order #${order.orderNumber} has been confirmed and is being prepared.`;
+            priority = 'high';
+            break;
+          case 'preparing':
+            title = 'Order Being Prepared 👨‍🍳';
+            message = `Your order #${order.orderNumber} is being prepared. It will be ready soon!`;
+            priority = 'high';
+            break;
+          case 'out-for-delivery':
+            title = 'Order Out for Delivery! 🚚';
+            message = `Your order #${order.orderNumber} is on the way to you. Track it in your orders.`;
+            priority = 'high';
+            break;
+          case 'delivered':
+            title = 'Order Delivered! 🎉';
+            message = `Your order #${order.orderNumber} has been delivered. Thank you for your order!`;
+            priority = 'high';
+            break;
+          case 'cancelled':
+            title = 'Order Cancelled';
+            message = `Your order #${order.orderNumber} has been cancelled.${notes ? ` Reason: ${notes}` : ''}`;
+            priority = 'high';
+            break;
+          default:
+            title = 'Order Status Updated';
+            message = `Your order #${order.orderNumber} status has been updated to ${status}.`;
+        }
+        
+        // Create database notification
+        await Notification.create({
+          user: order.customer._id,
+          recipient: order.customer._id,
+          title,
+          message,
+          type: 'order',
+          category: 'order',
+          priority,
+          metadata: {
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: status
+          }
+        });
+
+        // Send push notification
+        await sendPushNotification(
+          order.customer._id,
+          title,
+          message,
+          {
+            type: 'order',
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: status
+          }
+        );
+      } catch (notificationError) {
+        // Log error but don't fail the status update
+        console.error('Error sending status change notification:', notificationError);
+      }
+    }
 
     res.json({
       success: true,

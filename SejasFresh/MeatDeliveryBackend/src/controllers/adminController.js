@@ -197,9 +197,24 @@ exports.updateOrderStatusAdmin = async (req, res, next) => {
             status: status
           }
         });
+
+        // Send push notification
+        const { sendPushNotification } = require('../utils/pushNotification');
+        await sendPushNotification(
+          order.customer._id,
+          title,
+          message,
+          {
+            type: 'order',
+            orderId: order._id.toString(),
+            orderNumber: order.orderNumber,
+            screen: 'order-details',
+            status: status
+          }
+        );
       } catch (notificationError) {
         // Log error but don't fail the status update
-        console.error('Error creating status change notification:', notificationError);
+        console.error('Error sending status change notification:', notificationError);
       }
     }
     
