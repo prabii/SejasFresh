@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 // Configuration for different environments
 const CONFIG = {
   development: {
-    API_HOST: Constants.expoConfig?.extra?.apiHost || 'sejasfresh.cloud',
+    API_HOST: Constants.expoConfig?.extra?.apiHost || '192.168.1.5',
     API_PORT: Constants.expoConfig?.extra?.apiPort || '5000',
   },
   production: {

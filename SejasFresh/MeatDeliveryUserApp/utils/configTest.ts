@@ -36,7 +36,7 @@ export const testConfiguration = () => {
     console.log('1. Start your backend server: node server.js');
     console.log('2. Ensure server is running on port 5000');
     console.log('3. For Android emulator: adb reverse tcp:5000 tcp:5000');
-    console.log('4. Test API at: http://localhost:5000/api');
+    console.log('4. Test API at: http://localhost:5000/api (or https://meat-delivery-backend.onrender.com/api for production)');
   } else {
     console.log('🚀 Production Mode:');
     console.log('1. Update production API_HOST in config/api.ts');
