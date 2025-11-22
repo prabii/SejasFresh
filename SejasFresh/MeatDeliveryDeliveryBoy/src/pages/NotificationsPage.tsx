@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box,
   Typography,
@@ -6,9 +6,7 @@ import {
   ListItem,
   ListItemText,
   ListItemButton,
-  CircularProgress,
   Chip,
-  IconButton,
   Button,
   Paper,
   Divider,
@@ -16,7 +14,6 @@ import {
 import {
   Notifications as NotificationsIcon,
   CheckCircle as CheckIcon,
-  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';

@@ -82,7 +82,7 @@ export default function OrdersPage() {
 
   const { isAuthenticated } = useAuth();
 
-  const { data: ordersData, isLoading, error: ordersError } = useQuery({
+  const { data: ordersData, isLoading } = useQuery({
     queryKey: ['delivery-orders'],
     queryFn: async () => {
       try {
@@ -101,7 +101,7 @@ export default function OrdersPage() {
   const orders = (ordersData?.data || []) as Order[];
 
   // Get delivered orders history
-  const { data: deliveredOrders, isLoading: isLoadingDelivered, error: deliveredError } = useQuery<Order[]>({
+  const { data: deliveredOrders, isLoading: isLoadingDelivered } = useQuery<Order[]>({
     queryKey: ['delivered-orders'],
     queryFn: async () => {
       try {
@@ -117,7 +117,7 @@ export default function OrdersPage() {
     retry: 1,
   });
 
-  const { data: availableOrders, isLoading: isLoadingAvailable, error: availableError } = useQuery<Order[]>({
+  const { data: availableOrders, isLoading: isLoadingAvailable } = useQuery<Order[]>({
     queryKey: ['available-orders'],
     queryFn: async () => {
       try {
