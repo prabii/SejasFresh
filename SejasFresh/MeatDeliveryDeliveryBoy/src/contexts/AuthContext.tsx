@@ -25,10 +25,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const token = localStorage.getItem('delivery_token');
+    
     if (token) {
       api.get('/auth/me')
         .then((response) => {
+          if (!isMounted) return;
           if (response.data.success && response.data.user.role === 'delivery') {
             setUser(response.data.user);
           } else {
@@ -36,14 +39,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
         })
         .catch(() => {
+          if (!isMounted) return;
           localStorage.removeItem('delivery_token');
         })
         .finally(() => {
-          setLoading(false);
+          if (isMounted) {
+            setLoading(false);
+          }
         });
     } else {
       setLoading(false);
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (email: string, password: string) => {

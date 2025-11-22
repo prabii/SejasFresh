@@ -50,7 +50,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         return [];
       }
     },
-    refetchInterval: 30000, // Poll every 30 seconds
+    refetchInterval: 60000, // Poll every 60 seconds (reduced frequency)
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
+    refetchOnReconnect: false, // Prevent refetch on reconnect
     retry: 1,
   });
 
