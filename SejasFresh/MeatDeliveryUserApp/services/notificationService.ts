@@ -527,13 +527,27 @@ class NotificationService {
   async clearAllNotifications(): Promise<{ success: boolean; message: string; data: { modifiedCount: number } }> {
     try {
       // Ensure API_BASE_URL doesn't have trailing slash and construct URL explicitly
-      // Fix: Use explicit string to avoid any typos
-      const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
-      // Explicitly use 'notifications' (single 's') - no typos!
-      const url = baseUrl + '/notifications/clear-all';
-      console.log('🗑️ Clearing all notifications, URL:', url);
+      // Fix: Use explicit string concatenation to avoid any typos
+      let baseUrl = API_BASE_URL;
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.slice(0, -1);
+      }
+      
+      // Hardcode the path to ensure no typos - use single 's' in 'notifications'
+      const notificationPath = '/notifications/clear-all';
+      const url = baseUrl + notificationPath;
+      
+      // Verify URL doesn't have double 's'
+      if (url.includes('notificationss')) {
+        console.error('❌ ERROR: URL contains double s!', url);
+        throw new Error('URL construction error: contains notificationss');
+      }
+      
+      console.log('🗑️ Clearing all notifications');
       console.log('🗑️ API_BASE_URL:', API_BASE_URL);
-      console.log('🗑️ Constructed URL parts:', { baseUrl, path: '/notifications/clear-all' });
+      console.log('🗑️ baseUrl:', baseUrl);
+      console.log('🗑️ notificationPath:', notificationPath);
+      console.log('🗑️ Final URL:', url);
       
       const headers = await this.getAuthHeaders();
       console.log('Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'none' });
