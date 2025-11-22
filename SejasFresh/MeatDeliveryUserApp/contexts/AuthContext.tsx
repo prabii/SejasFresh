@@ -139,6 +139,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
 
       // Note: token/session should already be saved by authService methods
+      
+      // Register push notifications after login (non-blocking)
+      (async () => {
+        try {
+          const { notificationService } = await import('../services/notificationService');
+          const pushToken = await notificationService.registerForPushNotifications();
+          if (pushToken) {
+            await notificationService.sendPushTokenToBackend(pushToken);
+            console.log('✅ Push token registered and sent to backend after login');
+          }
+        } catch (pushError) {
+          // Don't fail login if push notification registration fails
+          console.debug('Push notification registration failed (non-critical):', pushError);
+        }
+      })();
     } catch (error) {
       console.error('Error saving user data (unexpected):', error);
       // Ensure user is set even if persistence failed
