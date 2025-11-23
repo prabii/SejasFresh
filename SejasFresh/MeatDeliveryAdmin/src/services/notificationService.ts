@@ -119,15 +119,30 @@ class NotificationService {
       // Send subscription to backend
       try {
         const subscriptionJson = subscription.toJSON();
-        await api.post('/users/push-subscription', {
+        const response = await api.post('/users/push-subscription', {
           subscription: subscriptionJson,
           platform: 'web'
         });
-        console.log('Push subscription registered with backend');
-        localStorage.setItem('admin_push_subscription', JSON.stringify(subscriptionJson));
-        return JSON.stringify(subscriptionJson);
+        
+        if (response.data.success) {
+          console.log('✅ Push subscription registered with backend');
+          localStorage.setItem('admin_push_subscription', JSON.stringify(subscriptionJson));
+          return JSON.stringify(subscriptionJson);
+        } else {
+          console.error('Failed to register push subscription:', response.data.message);
+          return null;
+        }
       } catch (error: any) {
-        console.error('Error registering push subscription:', error);
+        // Handle authentication errors
+        if (error.response?.status === 401) {
+          console.error('❌ Authentication required. Please log in again.');
+          // Clear any stale subscription
+          localStorage.removeItem('admin_push_subscription');
+        } else if (error.response?.status === 403) {
+          console.error('❌ Permission denied. Please check your account permissions.');
+        } else {
+          console.error('Error registering push subscription:', error.response?.data || error.message);
+        }
         return null;
       }
     } catch (error: any) {

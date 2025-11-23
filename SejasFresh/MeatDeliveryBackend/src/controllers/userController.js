@@ -7,9 +7,28 @@ exports.updatePushToken = async (req, res, next) => {
   try {
     const { pushToken, platform } = req.body;
 
+    // Validate token format
+    if (!pushToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Push token is required'
+      });
+    }
+
+    // If it's a fake web token (starts with 'web_'), ignore it
+    // Web tokens should use push-subscription endpoint instead
+    if (pushToken.startsWith('web_')) {
+      console.log(`⚠️  Ignoring fake web token for user ${req.user._id}. Use push-subscription endpoint instead.`);
+      return res.status(400).json({
+        success: false,
+        message: 'Web push tokens should use /push-subscription endpoint'
+      });
+    }
+
     req.user.pushToken = pushToken;
     await req.user.save();
 
+    console.log(`✅ Push token updated for user ${req.user._id}`);
     res.json({
       success: true,
       message: 'Push token updated'
