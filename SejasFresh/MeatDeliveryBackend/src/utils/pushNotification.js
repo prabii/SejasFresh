@@ -66,8 +66,15 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
           if (error.statusCode === 403) {
             console.log(`⚠️  VAPID key mismatch - user needs to re-subscribe with correct keys`);
           }
+          // Remove invalid subscription
           user.pushSubscription = null;
+          // Also remove fake web tokens if they exist
+          if (user.pushToken && user.pushToken.startsWith('web_')) {
+            console.log(`Also removing fake web token for user ${userId}`);
+            user.pushToken = null;
+          }
           await user.save();
+          console.log(`✅ Cleaned up invalid push credentials for user ${userId}`);
         }
         // Fall through to try Expo token
       }
@@ -79,9 +86,21 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
       return { success: false, error: 'No push token or subscription' };
     }
 
+    // Skip fake web tokens (they should use push-subscription endpoint)
+    if (user.pushToken.startsWith('web_')) {
+      console.log(`Skipping fake web token for user ${userId}. User needs to re-subscribe with correct VAPID keys.`);
+      // Clean up the fake token
+      user.pushToken = null;
+      await user.save();
+      return { success: false, error: 'Invalid web token - please re-subscribe' };
+    }
+
     // Validate Expo push token
     if (!Expo.isExpoPushToken(user.pushToken)) {
       console.log(`Invalid Expo push token for user ${userId}: ${user.pushToken}`);
+      // Clean up invalid token
+      user.pushToken = null;
+      await user.save();
       return { success: false, error: 'Invalid push token' };
     }
 
