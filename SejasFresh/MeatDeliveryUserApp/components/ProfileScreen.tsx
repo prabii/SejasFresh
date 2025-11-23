@@ -14,6 +14,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { addressService } from '../services/addressService';
 import { authService } from '../services/authService';
 import { orderService } from '../services/orderService';
+import { clearAllCache, getCacheInfo } from '../utils/cacheManager';
+import { useToast } from './ui/ToastProvider';
 
 const RED_COLOR = '#D13635';
 const LIGHT_GRAY = '#f5f5f5';
@@ -52,12 +54,18 @@ const profileMenuData = [
   },
   {
     id: '6',
+    iconName: 'trash-2',
+    title: 'Clear Cache',
+    iconType: 'feather',
+  },
+  {
+    id: '7',
     iconName: 'info',
     title: 'About Us',
     iconType: 'feather',
   },
   {
-    id: '7',
+    id: '8',
     iconName: 'log-out',
     title: 'Logout',
     iconType: 'feather',
@@ -176,7 +184,7 @@ const ProfileMenuItem: React.FC<{
     );
   };
 
-  const handleMenuItemPress = () => {
+  const handleMenuItemPress = async () => {
     switch (title) {
       case 'My Orders':
         router.push('/orders');
@@ -193,6 +201,9 @@ const ProfileMenuItem: React.FC<{
       case 'Help & FAQ':
         router.push('/faq');
         break;
+      case 'Clear Cache':
+        handleClearCache();
+        break;
       case 'About Us':
         router.push('/about-us');
         break;
@@ -203,6 +214,40 @@ const ProfileMenuItem: React.FC<{
         Alert.alert('Menu Item', `You tapped: ${title}`);
         break;
     }
+  };
+
+  const handleClearCache = async () => {
+    Alert.alert(
+      'Clear Cache',
+      'This will clear all cached images and data. Images will reload fresh. Continue?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const result = await clearAllCache();
+              if (result.success) {
+                Alert.alert('Success', 'Cache cleared successfully! Images will reload fresh.', [
+                  {
+                    text: 'OK',
+                  },
+                ]);
+              } else {
+                Alert.alert('Error', result.message);
+              }
+            } catch (error) {
+              console.error('Error clearing cache:', error);
+              Alert.alert('Error', 'Failed to clear cache. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const renderIcon = () => {

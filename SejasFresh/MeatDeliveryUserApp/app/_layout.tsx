@@ -1,12 +1,18 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ToastProvider } from '../components/ui/ToastProvider';
 import { AuthProvider } from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import { autoClearOldCache } from '../utils/cacheManager';
 
 export default function RootLayout() {
+  // Auto-clear old cache on app start
+  useEffect(() => {
+    autoClearOldCache().catch(console.error);
+  }, []);
   return (
     <SafeAreaProvider>
       <AuthProvider>
