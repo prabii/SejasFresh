@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
+import { notificationService } from '../services/notificationService';
 
 interface Notification {
   _id: string;
@@ -78,6 +79,27 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       setNotifications([]);
     }
   }, [data]);
+
+  // Register for push notifications on mount
+  useEffect(() => {
+    if (isAuthenticated) {
+      notificationService.registerForPushNotifications();
+    }
+  }, [isAuthenticated]);
+
+  // Show browser notifications for new unread notifications
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    const unreadNotifications = notifications.filter(n => !n.isRead);
+    if (unreadNotifications.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
+      const latest = unreadNotifications[0];
+      notificationService.showNotification(latest.title, {
+        body: latest.message,
+        data: latest.metadata
+      });
+    }
+  }, [notifications, isAuthenticated]);
 
   const unreadCount = Array.isArray(notifications) 
     ? notifications.filter((n) => !n.isRead).length 

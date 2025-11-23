@@ -38,17 +38,18 @@ export default function LoginPage() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{ px: { xs: 2, sm: 3 } }}>
       <Box
         sx={{
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          py: { xs: 2, sm: 0 },
         }}
       >
-        <Card sx={{ width: '100%' }}>
-          <CardContent sx={{ p: 4 }}>
+        <Card sx={{ width: '100%', maxWidth: 500 }}>
+          <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
             <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 3, color: '#D13635' }}>
               Admin Login
             </Typography>
