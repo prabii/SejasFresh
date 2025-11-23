@@ -32,24 +32,43 @@ class NotificationService {
    */
   async registerForPushNotifications(): Promise<string | null> {
     try {
+      console.log('🔔 Starting push notification registration...');
+      
       // Check if browser supports service workers and push
       if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.log('This browser does not support service workers or push notifications');
+        console.error('❌ Browser does not support service workers or push notifications');
+        console.log('Supported:', {
+          serviceWorker: 'serviceWorker' in navigator,
+          PushManager: 'PushManager' in window
+        });
         return null;
       }
 
       // Check if browser supports notifications
       if (!('Notification' in window)) {
-        console.log('This browser does not support notifications');
+        console.error('❌ Browser does not support notifications');
         return null;
       }
 
-      // Request permission
-      const permission = await Notification.requestPermission();
+      // Check current permission status
+      const currentPermission = Notification.permission;
+      console.log('Current notification permission:', currentPermission);
+      
+      // Request permission if not already granted
+      let permission = currentPermission;
+      if (currentPermission === 'default') {
+        console.log('Requesting notification permission...');
+        permission = await Notification.requestPermission();
+        console.log('Permission result:', permission);
+      }
+      
       if (permission !== 'granted') {
-        console.log('Notification permission denied');
+        console.warn('⚠️ Notification permission not granted:', permission);
+        console.log('User needs to allow notifications in browser settings');
         return null;
       }
+      
+      console.log('✅ Notification permission granted');
 
       // Register service worker
       let registration;
@@ -119,29 +138,38 @@ class NotificationService {
       // Send subscription to backend
       try {
         const subscriptionJson = subscription.toJSON();
+        console.log('📤 Sending subscription to backend...', {
+          endpoint: subscriptionJson.endpoint?.substring(0, 50) + '...',
+          hasKeys: !!(subscriptionJson.keys?.p256dh && subscriptionJson.keys?.auth)
+        });
+        
         const response = await api.post('/users/push-subscription', {
           subscription: subscriptionJson,
           platform: 'web'
         });
         
         if (response.data.success) {
-          console.log('✅ Push subscription registered with backend');
+          console.log('✅ Push subscription registered with backend successfully!');
+          console.log('Subscription saved for user');
           localStorage.setItem('admin_push_subscription', JSON.stringify(subscriptionJson));
           return JSON.stringify(subscriptionJson);
         } else {
-          console.error('Failed to register push subscription:', response.data.message);
+          console.error('❌ Failed to register push subscription:', response.data.message);
           return null;
         }
       } catch (error: any) {
         // Handle authentication errors
         if (error.response?.status === 401) {
           console.error('❌ Authentication required. Please log in again.');
+          console.error('Response:', error.response?.data);
           // Clear any stale subscription
           localStorage.removeItem('admin_push_subscription');
         } else if (error.response?.status === 403) {
           console.error('❌ Permission denied. Please check your account permissions.');
+          console.error('Response:', error.response?.data);
         } else {
-          console.error('Error registering push subscription:', error.response?.data || error.message);
+          console.error('❌ Error registering push subscription:', error.response?.data || error.message);
+          console.error('Full error:', error);
         }
         return null;
       }

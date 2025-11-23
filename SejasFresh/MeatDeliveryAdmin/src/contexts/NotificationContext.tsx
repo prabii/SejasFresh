@@ -51,12 +51,16 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   const registerPushNotifications = async () => {
     try {
+      console.log('🔔 Attempting to register push notifications...');
       const token = await notificationService.registerForPushNotifications();
       if (token) {
-        console.log('Push notifications registered');
+        console.log('✅ Push notifications registered successfully');
+      } else {
+        console.warn('⚠️ Push notification registration returned null - user may have denied permission or browser not supported');
       }
-    } catch (error) {
-      console.error('Error registering push notifications:', error);
+    } catch (error: any) {
+      console.error('❌ Error registering push notifications:', error);
+      console.error('Error details:', error.message, error.stack);
     }
   };
 
