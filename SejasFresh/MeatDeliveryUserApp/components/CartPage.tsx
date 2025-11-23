@@ -180,7 +180,7 @@ const CartItemCard: React.FC<{
   // Get image source - use backend image URL or fallback to local
   const getImageSource = () => {
     try {
-      return getProductImageSource(item.product);
+      return getProductImageSource(item.product || undefined);
     } catch (error) {
       console.error('Error getting image source:', error);
       return require('../assets/images/instant-pic.png');
@@ -657,11 +657,42 @@ const CartPage: React.FC = () => {
       setLoading(true);
       const cartData = await cartService.getCart();
       // Ensure cart is set even if it's empty
-      setCart(cartData || { items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart);
+      if (cartData) {
+        setCart(cartData);
+      } else {
+        // Create empty cart with required fields
+        const emptyCart: Cart = {
+          _id: '',
+          user: '',
+          items: [],
+          totalItems: 0,
+          totalAmount: 0,
+          subtotal: 0,
+          discountAmount: 0,
+          finalAmount: 0,
+          formattedTotal: '₹0.00',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        setCart(emptyCart);
+      }
     } catch (error: any) {
       console.error('Error loading cart:', error);
       // Set empty cart on error to prevent blank screen
-      setCart({ items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart);
+      const emptyCart: Cart = {
+        _id: '',
+        user: '',
+        items: [],
+        totalItems: 0,
+        totalAmount: 0,
+        subtotal: 0,
+        discountAmount: 0,
+        finalAmount: 0,
+        formattedTotal: '₹0.00',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setCart(emptyCart);
     } finally {
       setLoading(false);
     }
@@ -759,7 +790,19 @@ const CartPage: React.FC = () => {
   };
 
   // Ensure cart is never null
-  const safeCart = cart || { items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart;
+  const safeCart: Cart = cart || {
+    _id: '',
+    user: '',
+    items: [],
+    totalItems: 0,
+    totalAmount: 0,
+    subtotal: 0,
+    discountAmount: 0,
+    finalAmount: 0,
+    formattedTotal: '₹0.00',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 
   if (loading) {
     return (
