@@ -40,6 +40,19 @@ const protect = async (req, res, next) => {
 
     next();
   } catch (error) {
+    console.error('Auth middleware error:', error.message);
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token'
+      });
+    }
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired'
+      });
+    }
     return res.status(401).json({
       success: false,
       message: 'Not authorized to access this route'

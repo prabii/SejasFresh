@@ -19,7 +19,7 @@ Make sure your code is pushed to GitHub (already done ✅).
 1. Go to [Render Dashboard](https://dashboard.render.com)
 2. Click **"New +"** → **"Web Service"**
 3. Connect your GitHub account if not already connected
-4. Select your repository: `your-username/SejasFresh`
+4. Select your repository: `prabii/SejasFresh`
 5. Configure the service:
    - **Name**: `meat-delivery-backend` (or any name you prefer)
    - **Root Directory**: `SejasFresh/MeatDeliveryBackend`

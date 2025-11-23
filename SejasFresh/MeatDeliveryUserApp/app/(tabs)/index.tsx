@@ -52,19 +52,19 @@ export default function HomeScreen() {
     const fetchAllServices = async () => {
       try {
         // Use static imports - call services directly without dynamic imports
-        // Call common exported methods if present
-        // Only call protected endpoints if authenticated
+              // Call common exported methods if present
+              // Only call protected endpoints if authenticated
         addressService.getSavedAddresses().catch(() => {});
         productService.getAllProducts().catch(() => {});
         cartService.getCart().catch(() => {});
         
-        // Protected endpoints - only call if authenticated
-        if (isAuthenticated) {
+              // Protected endpoints - only call if authenticated
+              if (isAuthenticated) {
           orderService.getUserOrders().catch(() => {});
           notificationService.getNotifications().catch(() => {});
           couponService.getActiveCoupons().catch(() => {});
           authService.getMe().catch(() => {});
-        }
+              }
       } catch (error) {
         // Silently handle errors - don't show to user
         console.debug('Error fetching services:', error);

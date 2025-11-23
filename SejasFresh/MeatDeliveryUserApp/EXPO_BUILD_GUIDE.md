@@ -177,7 +177,7 @@ Your `eas.json` file controls build settings. Here's what you can configure:
         "buildType": "app-bundle"
       },
       "ios": {
-        "bundleIdentifier": "com.sejasfresh.MeatDeliveryUserApp"
+        "bundleIdentifier": "com.batman1428.MeatDeliveryUserApp"
       }
     }
   },

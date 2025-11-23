@@ -109,17 +109,22 @@ exports.login = async (req, res, next) => {
 
     // Admin login with email/password
     if (email && password) {
+      console.log(`Admin login attempt for email: ${email}`);
       const user = await User.findOne({ email }).select('+password');
       
       if (!user) {
+        console.log(`Admin login failed: User not found for email ${email}`);
         return res.status(401).json({
           success: false,
           message: 'Invalid email or password'
         });
       }
 
+      console.log(`User found: ${user._id}, Role: ${user.role}, Active: ${user.isActive}, Has Password: ${!!user.password}`);
+
       // Check if user has a password (admin users should have password)
       if (!user.password) {
+        console.log(`Admin login failed: User ${user._id} has no password set`);
         return res.status(401).json({
           success: false,
           message: 'Invalid email or password'
@@ -129,6 +134,7 @@ exports.login = async (req, res, next) => {
       // Verify password
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
+        console.log(`Admin login failed: Invalid password for user ${user._id}`);
         return res.status(401).json({
           success: false,
           message: 'Invalid email or password'
@@ -136,6 +142,7 @@ exports.login = async (req, res, next) => {
       }
 
       if (!user.isActive) {
+        console.log(`Admin login failed: User ${user._id} account is inactive`);
         return res.status(401).json({
           success: false,
           message: 'Account is inactive'
@@ -144,6 +151,7 @@ exports.login = async (req, res, next) => {
 
       // Check if user is admin or delivery
       if (user.role !== 'admin' && user.role !== 'delivery') {
+        console.log(`Admin login failed: User ${user._id} has role ${user.role}, admin/delivery required`);
         return res.status(403).json({
           success: false,
           message: 'Access denied. Admin or delivery role required.'
@@ -151,6 +159,7 @@ exports.login = async (req, res, next) => {
       }
 
       const token = generateToken(user._id);
+      console.log(`Admin login successful for user ${user._id} (${user.email})`);
 
       return res.json({
         success: true,

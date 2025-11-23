@@ -27,15 +27,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const token = localStorage.getItem('admin_token');
     if (token) {
       // Verify token and get user
+      console.log('Verifying admin token on mount...');
       api.get('/auth/me')
         .then((response) => {
+          console.log('Token verification response:', response.data);
           if (response.data.success && response.data.user.role === 'admin') {
             setUser(response.data.user);
+            console.log('Admin token verified, user set');
           } else {
+            console.warn('Token verification failed: User role is not admin or response unsuccessful');
             localStorage.removeItem('admin_token');
           }
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('Token verification error:', error.response?.data || error.message);
           localStorage.removeItem('admin_token');
         })
         .finally(() => {
@@ -48,16 +53,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Admin login attempt:', email);
       const response = await api.post('/auth/login', { email, password });
+      console.log('Login response:', response.data);
+      
       if (response.data.success) {
         if (response.data.user.role !== 'admin') {
+          console.error('Login failed: User role is not admin:', response.data.user.role);
           throw new Error('Access denied. Admin role required.');
         }
         localStorage.setItem('admin_token', response.data.token);
         setUser(response.data.user);
+        console.log('Admin login successful, token saved');
+      } else {
+        throw new Error(response.data.message || 'Login failed');
       }
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      console.error('Login error:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || error.message || 'Login failed');
     }
   };
 
