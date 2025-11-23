@@ -991,14 +991,56 @@ export const mockNotifications: NotificationItem[] = [
 
 // Helper function to get product image source
 export const getProductImageSource = (product: Product): any => {
-  // Try to get image from product name mapping
+  let imageUrl: string | null = null;
+  
+  // Try images array first (from backend)
   if (product.images && product.images.length > 0) {
-    const imageName = product.images[0].url;
+    imageUrl = product.images[0]?.url || null;
+  }
+  
+  // Fallback to single image field
+  if (!imageUrl && product.image) {
+    imageUrl = product.image;
+  }
+  
+  if (imageUrl) {
+    // Check if it's already a full URL (from backend)
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      // Ensure HTTPS for Render backend
+      const normalizedUrl = imageUrl.replace('http://meat-delivery-backend.onrender.com', 'https://meat-delivery-backend.onrender.com');
+      return { uri: normalizedUrl };
+    }
+    
+    // Construct full URL from backend
+    try {
+      const { getCurrentConfig } = require('../config/api');
+      const config = getCurrentConfig();
+      const baseUrl = config.API_URL.replace('/api', '');
+      
+      // Ensure baseUrl uses HTTPS for Render
+      const httpsBaseUrl = baseUrl.replace('http://meat-delivery-backend.onrender.com', 'https://meat-delivery-backend.onrender.com');
+      
+      // Handle different URL formats
+      if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
+        const cleanPath = imageUrl.replace(/^\/?uploads\//, '');
+        return { uri: `${httpsBaseUrl}/uploads/${cleanPath}` };
+      } else if (imageUrl.startsWith('/')) {
+        return { uri: `${httpsBaseUrl}${imageUrl}` };
+      } else {
+        return { uri: `${httpsBaseUrl}/uploads/${imageUrl}` };
+      }
+    } catch (error) {
+      // If config fails, fall back to mock image
+      console.warn('Failed to get API config, using fallback image:', error);
+    }
+  }
+  
+  // Fallback to mock image based on product name
+  if (product.name) {
     return getProductImage(product.name);
   }
-  if (product.image) {
-    return getProductImage(product.name);
-  }
+  
+  // Final fallback
   return require('../assets/images/instant-pic.png');
 };
 

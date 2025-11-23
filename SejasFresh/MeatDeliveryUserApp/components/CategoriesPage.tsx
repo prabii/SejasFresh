@@ -95,9 +95,11 @@ const getProductImageSource = (product?: Product, productName?: string): any => 
     }
     
     if (imageUrl) {
-      // Check if it's already a full URL
+      // Check if it's already a full URL (from backend)
       if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return { uri: imageUrl };
+        // Ensure HTTPS for Render backend
+        const normalizedUrl = imageUrl.replace('http://meat-delivery-backend.onrender.com', 'https://meat-delivery-backend.onrender.com');
+        return { uri: normalizedUrl };
       }
       
       // Construct full URL from backend
@@ -105,13 +107,17 @@ const getProductImageSource = (product?: Product, productName?: string): any => 
       const config = getCurrentConfig();
       const baseUrl = config.API_URL.replace('/api', '');
       
+      // Ensure baseUrl uses HTTPS for Render
+      const httpsBaseUrl = baseUrl.replace('http://meat-delivery-backend.onrender.com', 'https://meat-delivery-backend.onrender.com');
+      
       // Handle different URL formats
       if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
-        return { uri: `${baseUrl}/uploads/${imageUrl.replace(/^\/?uploads\//, '')}` };
+        const cleanPath = imageUrl.replace(/^\/?uploads\//, '');
+        return { uri: `${httpsBaseUrl}/uploads/${cleanPath}` };
       } else if (imageUrl.startsWith('/')) {
-        return { uri: `${baseUrl}${imageUrl}` };
+        return { uri: `${httpsBaseUrl}${imageUrl}` };
       } else {
-        return { uri: `${baseUrl}/uploads/${imageUrl}` };
+        return { uri: `${httpsBaseUrl}/uploads/${imageUrl}` };
       }
     }
   }
