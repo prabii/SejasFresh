@@ -179,8 +179,18 @@ const CartItemCard: React.FC<{
 
   // Get image source - use backend image URL or fallback to local
   const getImageSource = () => {
-    return getProductImageSource(item.product);
+    try {
+      return getProductImageSource(item.product);
+    } catch (error) {
+      console.error('Error getting image source:', error);
+      return require('../assets/images/instant-pic.png');
+    }
   };
+
+  // Safety check for item
+  if (!item || !item.product) {
+    return null;
+  }
 
   return (
     <View style={styles.cartItemCard}>
