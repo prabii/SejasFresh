@@ -33,16 +33,20 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
       return { success: false, error: 'Invalid push token' };
     }
 
-    // Create the push message
+    // Create the push message with app name in title
+    // Format: "Sejas Fresh: [Original Title]" to ensure app name shows
+    const notificationTitle = title.startsWith('Sejas Fresh') ? title : `Sejas Fresh: ${title}`;
+    
     const messages = [{
       to: user.pushToken,
       sound: 'default',
-      title: title,
+      title: notificationTitle,
       subtitle: 'Sejas Fresh', // App name as subtitle
       body: body,
       data: {
         ...data,
-        userId: userId.toString()
+        userId: userId.toString(),
+        appName: 'Sejas Fresh' // Include app name in data
       },
       priority: 'high',
       channelId: 'order-updates', // Android notification channel
@@ -56,16 +60,18 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
         vibrate: [0, 250, 250, 250],
         sticky: false,
         visibility: 'public',
-        channelName: 'Sejas Fresh', // App name for Android channel
+        channelName: 'Sejas Fresh - Order Updates', // App name for Android channel
         smallIcon: 'ic_notification', // Use app icon
-        largeIcon: 'ic_notification' // Use app icon
+        largeIcon: 'ic_notification', // Use app icon
+        tag: 'sejas-fresh', // Tag for grouping notifications
       },
       // iOS-specific options
       ios: {
         sound: 'default',
         badge: 1,
         _displayInForeground: true,
-        subtitle: 'Sejas Fresh' // App name as subtitle
+        subtitle: 'Sejas Fresh', // App name as subtitle
+        categoryId: 'ORDER_UPDATES', // Category for iOS
       }
     }];
 

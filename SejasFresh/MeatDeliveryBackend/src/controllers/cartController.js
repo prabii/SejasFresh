@@ -370,6 +370,39 @@ exports.applyCoupon = async (req, res, next) => {
       });
     }
 
+    // Check if a coupon is already applied
+    if (cart.appliedCoupon) {
+      // If the same coupon is being applied again, just return success
+      if (cart.appliedCoupon.toString() === coupon._id.toString()) {
+        await cart.populate('appliedCoupon');
+        const discount = coupon.calculateDiscount(totals.subtotal);
+        const cartObj = cart.toObject();
+        cartObj.totalItems = totals.totalItems;
+        cartObj.subtotal = totals.subtotal;
+        cartObj.appliedCoupon = {
+          code: coupon.code,
+          discount: discount,
+          appliedAt: cart.updatedAt || new Date().toISOString()
+        };
+        cartObj.discountAmount = discount;
+        cartObj.finalAmount = totals.subtotal - discount;
+        cartObj.totalAmount = totals.subtotal - discount;
+        cartObj.formattedTotal = `₹${(totals.subtotal - discount).toLocaleString('en-IN')}`;
+        
+        return res.json({
+          success: true,
+          message: 'Coupon already applied',
+          data: cartObj
+        });
+      } else {
+        // Different coupon - remove the old one first
+        return res.status(400).json({
+          success: false,
+          message: 'A coupon is already applied. Please remove it first before applying a new one.'
+        });
+      }
+    }
+
     if (!coupon.isValid(totals.subtotal, req.user._id)) {
       // Check if it's because user already used it and limit is reached
       const hasUsed = coupon.usedBy && coupon.usedBy.some(id => id.toString() === req.user._id.toString());

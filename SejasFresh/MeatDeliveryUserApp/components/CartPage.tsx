@@ -393,6 +393,23 @@ const CouponAndSummary: React.FC<{
       return;
     }
 
+    // Prevent applying if already validating or if coupon is already applied
+    if (isValidatingCoupon) {
+      return;
+    }
+
+    // Check if the same coupon is already applied
+    if (isCouponApplied() && cart?.appliedCoupon?.code?.toUpperCase() === couponCode.trim().toUpperCase()) {
+      setAppliedCouponError('This coupon is already applied');
+      return;
+    }
+
+    // If a different coupon is already applied, show error
+    if (isCouponApplied() && cart?.appliedCoupon?.code?.toUpperCase() !== couponCode.trim().toUpperCase()) {
+      setAppliedCouponError('A coupon is already applied. Please remove it first.');
+      return;
+    }
+
     try {
       setIsValidatingCoupon(true);
       setAppliedCouponError(null);

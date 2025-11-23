@@ -27,6 +27,11 @@ const API_BASE_URL = getApiUrl();
 // This ensures notifications show as system notifications (like Snapchat)
 Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
+    // Customize notification title to include app name
+    // In production builds, this will show "Sejas Fresh" instead of "Expo Go"
+    const customTitle = notification.request.content.title || 'Sejas Fresh';
+    const customSubtitle = notification.request.content.subtitle || 'Sejas Fresh';
+    
     // Always show as system notification, even when app is closed
     return {
       shouldShowAlert: true,      // Show alert/system notification
@@ -165,11 +170,12 @@ class NotificationService {
 
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {
-        name: 'Default',
+        name: 'Sejas Fresh',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#D13635',
         sound: 'default',
+        description: 'Notifications from Sejas Fresh',
       });
 
       // Create channels for different notification types
@@ -195,12 +201,12 @@ class NotificationService {
       });
 
       await Notifications.setNotificationChannelAsync('promotions', {
-        name: 'Promotions & Offers',
+        name: 'Sejas Fresh - Promotions',
         importance: Notifications.AndroidImportance.DEFAULT,
         vibrationPattern: [0, 250],
         lightColor: '#D13635',
         sound: 'default',
-        description: 'Special offers and promotional notifications',
+        description: 'Special offers and promotional notifications from Sejas Fresh',
       });
     }
 

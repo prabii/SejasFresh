@@ -30,6 +30,11 @@
       "package": "com.batman1428.MeatDeliveryUserApp",
       "versionCode": 2,
       "allowBackup": false,
+      "notification": {
+        "icon": "./assets/images/notification-icon.png",
+        "color": "#D13635",
+        "sound": "default"
+      },
       "blockedPermissions": [
         "CAMERA",
         "RECORD_AUDIO"
