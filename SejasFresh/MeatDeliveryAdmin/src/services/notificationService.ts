@@ -78,7 +78,7 @@ class NotificationService {
 
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: this.urlBase64ToUint8Array(this.VAPID_PUBLIC_KEY)
+          applicationServerKey: this.urlBase64ToUint8Array(this.VAPID_PUBLIC_KEY) as BufferSource
         });
         console.log('Push subscription created');
       } else {
