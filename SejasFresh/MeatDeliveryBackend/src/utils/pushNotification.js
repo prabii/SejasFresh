@@ -59,9 +59,13 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
         return { success: true, method: 'web-push' };
       } catch (error) {
         console.error(`Web push error for user ${userId}:`, error);
-        // If subscription is invalid, remove it
-        if (error.statusCode === 410 || error.statusCode === 404) {
-          console.log(`Removing invalid subscription for user ${userId}`);
+        // If subscription is invalid or VAPID key mismatch, remove it
+        // 403 = VAPID key mismatch, 410 = subscription expired, 404 = not found
+        if (error.statusCode === 410 || error.statusCode === 404 || error.statusCode === 403) {
+          console.log(`Removing invalid subscription for user ${userId} (status: ${error.statusCode})`);
+          if (error.statusCode === 403) {
+            console.log(`⚠️  VAPID key mismatch - user needs to re-subscribe with correct keys`);
+          }
           user.pushSubscription = null;
           await user.save();
         }

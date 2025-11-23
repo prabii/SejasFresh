@@ -82,7 +82,38 @@ class NotificationService {
         });
         console.log('Push subscription created');
       } else {
-        console.log('Already subscribed to push notifications');
+        // Check if subscription matches current VAPID key
+        // If VAPID keys changed, we need to re-subscribe
+        const currentKey = this.urlBase64ToUint8Array(this.VAPID_PUBLIC_KEY);
+        try {
+          // Try to get subscription details to verify it's still valid
+          const subscriptionKey = subscription.getKey('p256dh');
+          if (!subscriptionKey) {
+            // Re-subscribe if key is missing
+            console.log('Re-subscribing due to missing subscription key');
+            await subscription.unsubscribe();
+            subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: currentKey as BufferSource
+            });
+            console.log('Push subscription recreated');
+          } else {
+            console.log('Already subscribed to push notifications');
+          }
+        } catch (error) {
+          // If subscription is invalid, re-subscribe
+          console.log('Re-subscribing due to invalid subscription:', error);
+          try {
+            await subscription.unsubscribe();
+          } catch (e) {
+            // Ignore unsubscribe errors
+          }
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: currentKey as BufferSource
+          });
+          console.log('Push subscription recreated');
+        }
       }
 
       // Send subscription to backend

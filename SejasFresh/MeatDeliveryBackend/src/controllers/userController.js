@@ -33,11 +33,24 @@ exports.updatePushSubscription = async (req, res, next) => {
       });
     }
 
-    // Store web push subscription
+    // Validate subscription has required fields
+    if (!subscription.endpoint || !subscription.keys || !subscription.keys.p256dh || !subscription.keys.auth) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid push subscription format'
+      });
+    }
+
+    // Store web push subscription (replace old one if exists)
     req.user.pushSubscription = subscription;
+    // Also clear old fake web tokens if they exist
+    if (req.user.pushToken && req.user.pushToken.startsWith('web_')) {
+      console.log(`Clearing old fake web token for user ${req.user._id}`);
+      req.user.pushToken = null;
+    }
     await req.user.save();
 
-    console.log(`✅ Web push subscription saved for user ${req.user._id}`);
+    console.log(`✅ Web push subscription saved for user ${req.user._id} (endpoint: ${subscription.endpoint.substring(0, 50)}...)`);
 
     res.json({
       success: true,
