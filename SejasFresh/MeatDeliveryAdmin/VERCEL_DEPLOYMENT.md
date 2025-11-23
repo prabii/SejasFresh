@@ -9,7 +9,7 @@
    - Click **"Add New..."** → **"Project"**
 
 2. **Import GitHub Repository**
-   - Select your repository: `prabii/SejasFresh`
+   - Select your repository: `your-username/SejasFresh`
    - Click **"Import"**
 
 3. **Configure Project**

@@ -11,7 +11,7 @@
 ### View Build Logs:
 ```bash
 # View build progress in browser
-https://expo.dev/accounts/batman1428/projects/MeatDeliveryUserApp/builds/3b1f073f-4f5c-418f-a252-cda5b42b5f1e
+https://expo.dev/accounts/your-username/projects/MeatDeliveryUserApp/builds/3b1f073f-4f5c-418f-a252-cda5b42b5f1e
 
 # Check build status in terminal
 eas build:list --limit 1
