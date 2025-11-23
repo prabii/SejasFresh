@@ -132,8 +132,40 @@ const sendPushNotificationToMultiple = async (userIds, title, body, data = {}) =
   return results;
 };
 
+/**
+ * Send push notification to all users with a specific role
+ * @param {String} role - User role ('admin', 'delivery', 'customer')
+ * @param {String} title - Notification title
+ * @param {String} body - Notification message
+ * @param {Object} data - Additional data to send with notification
+ * @returns {Promise<Object>} - Result of sending notifications
+ */
+const sendPushNotificationToRole = async (role, title, body, data = {}) => {
+  try {
+    const users = await User.find({ role, isActive: true, pushToken: { $ne: null } }).select('_id pushToken');
+    
+    if (users.length === 0) {
+      console.log(`No users with role '${role}' and push tokens found`);
+      return { success: false, error: 'No users found' };
+    }
+
+    const results = [];
+    for (const user of users) {
+      const result = await sendPushNotification(user._id, title, body, { ...data, role });
+      results.push({ userId: user._id.toString(), ...result });
+    }
+
+    console.log(`✅ Push notifications sent to ${results.filter(r => r.success).length}/${users.length} ${role} users`);
+    return { success: true, results, sent: results.filter(r => r.success).length, total: users.length };
+  } catch (error) {
+    console.error(`Error sending push notifications to role '${role}':`, error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   sendPushNotification,
-  sendPushNotificationToMultiple
+  sendPushNotificationToMultiple,
+  sendPushNotificationToRole
 };
 

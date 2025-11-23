@@ -208,7 +208,7 @@ exports.acceptOrder = async (req, res, next) => {
           }
         });
 
-        // Send push notification
+        // Send push notification to customer
         await sendPushNotification(
           order.customer._id,
           title,
@@ -225,6 +225,61 @@ exports.acceptOrder = async (req, res, next) => {
             }
           }
         );
+
+        // Send push notification to all admin users about delivery acceptance
+        const User = require('../models/User');
+        const adminUsers = await User.find({ role: 'admin', isActive: true }).select('_id');
+        if (adminUsers.length > 0) {
+          const adminTitle = 'Order Accepted for Delivery! 🚚';
+          const adminMessage = `Order #${order.orderNumber} has been accepted by ${deliveryAgent.firstName} ${deliveryAgent.lastName}`;
+          
+          // Create notification for each admin
+          for (const admin of adminUsers) {
+            try {
+              await Notification.create({
+                user: admin._id,
+                title: adminTitle,
+                message: adminMessage,
+                type: 'order',
+                category: 'order',
+                priority: 'high',
+                metadata: {
+                  orderId: order._id.toString(),
+                  orderNumber: order.orderNumber,
+                  screen: 'orders',
+                  status: 'out-for-delivery',
+                  deliveryAgent: {
+                    name: `${deliveryAgent.firstName} ${deliveryAgent.lastName}`,
+                    phone: deliveryAgent.phone
+                  },
+                  action: 'view'
+                }
+              });
+
+              // Send push notification to admin
+              await sendPushNotification(
+                admin._id,
+                adminTitle,
+                adminMessage,
+                {
+                  type: 'order',
+                  orderId: order._id.toString(),
+                  orderNumber: order.orderNumber,
+                  screen: 'orders',
+                  status: 'out-for-delivery',
+                  deliveryAgent: {
+                    name: `${deliveryAgent.firstName} ${deliveryAgent.lastName}`,
+                    phone: deliveryAgent.phone
+                  },
+                  action: 'view',
+                  role: 'admin'
+                }
+              );
+            } catch (adminNotifError) {
+              console.error(`Error sending notification to admin ${admin._id}:`, adminNotifError);
+            }
+          }
+        }
       } catch (notificationError) {
         // Log error but don't fail the order acceptance
         console.error('Error sending delivery acceptance notification:', notificationError);

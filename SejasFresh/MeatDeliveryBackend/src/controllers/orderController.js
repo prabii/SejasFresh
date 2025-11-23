@@ -165,6 +165,7 @@ exports.createOrder = async (req, res, next) => {
     try {
       const Notification = require('../models/Notification');
       const { sendPushNotification } = require('../utils/pushNotification');
+      const User = require('../models/User');
       
       const title = 'Order Placed Successfully! 🎉';
       const message = `Your order #${order.orderNumber} has been placed. We'll notify you when it's confirmed.`;
@@ -183,7 +184,7 @@ exports.createOrder = async (req, res, next) => {
         }
       });
 
-      // Send push notification
+      // Send push notification to customer
       await sendPushNotification(
         req.user._id,
         title,
@@ -195,6 +196,50 @@ exports.createOrder = async (req, res, next) => {
           screen: 'order-details'
         }
       );
+
+      // Send push notification to all admin users
+      const adminUsers = await User.find({ role: 'admin', isActive: true }).select('_id');
+      if (adminUsers.length > 0) {
+        const adminTitle = 'New Order Received! 📦';
+        const adminMessage = `New order #${order.orderNumber} has been placed. Total: ₹${order.pricing.total.toLocaleString('en-IN')}`;
+        
+        // Create notification for each admin
+        for (const admin of adminUsers) {
+          try {
+            await Notification.create({
+              user: admin._id,
+              title: adminTitle,
+              message: adminMessage,
+              type: 'order',
+              category: 'order',
+              priority: 'high',
+              metadata: {
+                orderId: order._id.toString(),
+                orderNumber: order.orderNumber,
+                screen: 'orders',
+                action: 'view'
+              }
+            });
+
+            // Send push notification to admin
+            await sendPushNotification(
+              admin._id,
+              adminTitle,
+              adminMessage,
+              {
+                type: 'order',
+                orderId: order._id.toString(),
+                orderNumber: order.orderNumber,
+                screen: 'orders',
+                action: 'view',
+                role: 'admin'
+              }
+            );
+          } catch (adminNotifError) {
+            console.error(`Error sending notification to admin ${admin._id}:`, adminNotifError);
+          }
+        }
+      }
     } catch (notificationError) {
       // Log error but don't fail the order creation
       console.error('Error sending order placement notification:', notificationError);
