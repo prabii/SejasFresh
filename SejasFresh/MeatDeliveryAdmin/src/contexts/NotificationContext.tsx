@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { notificationService, Notification } from '../services/notificationService';
+import { notificationService, Notification as NotificationType } from '../services/notificationService';
 import { useAuth } from './AuthContext';
 
 interface NotificationContextType {
-  notifications: Notification[];
+  notifications: NotificationType[];
   unreadCount: number;
   loading: boolean;
   registerPushNotifications: () => Promise<void>;
@@ -16,7 +16,7 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuth();

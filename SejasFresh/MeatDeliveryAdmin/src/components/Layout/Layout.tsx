@@ -88,7 +88,7 @@ export default function Layout() {
               </ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItemButton>
-          </List>
+          </ListItem>
         </List>
       </Box>
     </>
