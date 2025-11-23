@@ -38,6 +38,7 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
       to: user.pushToken,
       sound: 'default',
       title: title,
+      subtitle: 'Sejas Fresh', // App name as subtitle
       body: body,
       data: {
         ...data,
@@ -54,13 +55,17 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
         sound: 'default',
         vibrate: [0, 250, 250, 250],
         sticky: false,
-        visibility: 'public'
+        visibility: 'public',
+        channelName: 'Sejas Fresh', // App name for Android channel
+        smallIcon: 'ic_notification', // Use app icon
+        largeIcon: 'ic_notification' // Use app icon
       },
       // iOS-specific options
       ios: {
         sound: 'default',
         badge: 1,
-        _displayInForeground: true
+        _displayInForeground: true,
+        subtitle: 'Sejas Fresh' // App name as subtitle
       }
     }];
 

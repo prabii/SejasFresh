@@ -69,7 +69,18 @@
           "mode": "production",
           "androidMode": "default",
           "iosDisplayInForeground": true,
-          "androidDisplayInForeground": true
+          "androidDisplayInForeground": true,
+          "sounds": [],
+          "android": {
+            "icon": "./assets/images/notification-icon.png",
+            "color": "#D13635",
+            "sound": "default",
+            "channelId": "order-updates",
+            "channelName": "Sejas Fresh"
+          },
+          "ios": {
+            "sound": "default"
+          }
         }
       ],
       [

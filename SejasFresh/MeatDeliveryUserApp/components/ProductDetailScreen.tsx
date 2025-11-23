@@ -17,7 +17,7 @@ import { useNotificationContext } from '../contexts/NotificationContext';
 import { cartService } from '../services/cartService';
 import { Product, productService } from '../services/productService';
 import { useToast } from './ui/ToastProvider';
-import { getProductImageSource } from '../data/mockData';
+import { getProductImages, getProductImageSource } from '../utils/imageUtils';
 
 const { width: screenWidth } = Dimensions.get('window');
 const RED_COLOR = '#D13635';
@@ -109,16 +109,7 @@ const ProductDetailScreen: React.FC = () => {
     }, [refreshCartCount])
   );
 
-  // Get product images
-  const getProductImages = (product: Product): any[] => {
-    if (product.images && product.images.length > 0) {
-      return product.images.map(img => img.url);
-    }
-    if (product.image) {
-      return [product.image];
-    }
-    return [getProductImageSource(product)];
-  };
+  // Get product images - using utility function
 
   // Format review count
   const formatReviewCount = (count: number): string => {

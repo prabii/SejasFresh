@@ -124,39 +124,17 @@ const MyOrdersScreen: React.FC = () => {
   const getProductImage = (order: Order) => {
     if (order.items.length > 0) {
       const firstItem = order.items[0];
-      let imageUrl: string | null = null;
-
-      // Try multiple image sources
-      // 1. Try images array (new structure)
-      if (firstItem.product?.images && firstItem.product.images.length > 0) {
-        imageUrl = firstItem.product.images[0]?.url || null;
+      const { getProductImageSource, normalizeImageUrl } = require('../utils/imageUtils');
+      
+      // Try item.image first (from order creation)
+      if ((firstItem as any).image) {
+        const normalizedUrl = normalizeImageUrl((firstItem as any).image);
+        if (normalizedUrl) {
+          return { uri: normalizedUrl };
+        }
       }
       
-      // 2. Try item.image (from order creation - stored in order item)
-      if (!imageUrl && (firstItem as any).image) {
-        imageUrl = (firstItem as any).image;
-      }
-
-      if (imageUrl) {
-        // Check if it's already a full URL
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-          return { uri: imageUrl };
-        }
-        
-        // Construct full URL from backend
-        const { getCurrentConfig } = require('../config/api');
-        const config = getCurrentConfig();
-        const baseUrl = config.API_URL.replace('/api', '');
-        
-        // Handle different URL formats
-        if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
-          return { uri: `${baseUrl}/uploads/${imageUrl.replace(/^\/?uploads\//, '')}` };
-        } else if (imageUrl.startsWith('/')) {
-          return { uri: `${baseUrl}${imageUrl}` };
-        } else {
-          return { uri: `${baseUrl}/uploads/${imageUrl}` };
-        }
-      }
+      return getProductImageSource(firstItem.product);
     }
     
     // Fallback to default image

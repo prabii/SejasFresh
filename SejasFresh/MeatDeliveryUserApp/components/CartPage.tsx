@@ -178,39 +178,8 @@ const CartItemCard: React.FC<{
 
   // Get image source - use backend image URL or fallback to local
   const getImageSource = () => {
-    let imageUrl: string | null = null;
-    
-    // Try images array first (new API structure)
-    if (item.product?.images && item.product.images.length > 0 && item.product.images[0].url) {
-      imageUrl = item.product.images[0].url;
-    }
-    // Fallback to single image field (legacy support)
-    else if (item.product?.image) {
-      imageUrl = item.product.image;
-    }
-    
-    if (imageUrl) {
-      // Check if it's already a full URL
-      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return { uri: imageUrl };
-      }
-      
-      // Construct full URL from backend
-      const config = getCurrentConfig();
-      const baseUrl = config.API_URL.replace('/api', '');
-      
-      // Handle different URL formats
-      if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
-        return { uri: `${baseUrl}/uploads/${imageUrl.replace(/^\/?uploads\//, '')}` };
-      } else if (imageUrl.startsWith('/')) {
-        return { uri: `${baseUrl}${imageUrl}` };
-      } else {
-        return { uri: `${baseUrl}/uploads/${imageUrl}` };
-      }
-    }
-    
-    // Fallback to default image
-    return require('../assets/images/instant-pic.png');
+    const { getProductImageSource } = require('../utils/imageUtils');
+    return getProductImageSource(item.product);
   };
 
   return (
@@ -300,37 +269,7 @@ const ProductCard: React.FC<{
 
   // Get image source - use backend image URL or fallback to local
   const getImageSource = () => {
-    let imageUrl: string | null = null;
-    
-    // Try images array first, then single image field
-    if (item.images && item.images.length > 0 && item.images[0].url) {
-      imageUrl = item.images[0].url;
-    } else if (item.image) {
-      imageUrl = item.image;
-    }
-    
-    if (imageUrl) {
-      // Check if it's already a full URL
-      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-        return { uri: imageUrl };
-      }
-      
-      // Construct full URL from backend
-      const config = getCurrentConfig();
-      const baseUrl = config.API_URL.replace('/api', '');
-      
-      // Handle different URL formats
-      if (imageUrl.startsWith('/uploads/') || imageUrl.startsWith('uploads/')) {
-        return { uri: `${baseUrl}/uploads/${imageUrl.replace(/^\/?uploads\//, '')}` };
-      } else if (imageUrl.startsWith('/')) {
-        return { uri: `${baseUrl}${imageUrl}` };
-      } else {
-        return { uri: `${baseUrl}/uploads/${imageUrl}` };
-      }
-    }
-    
-    // Fallback to default image
-    return require('../assets/images/instant-pic.png');
+    return getProductImageSource(item);
   };
 
   return (
