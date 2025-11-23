@@ -25,11 +25,19 @@ export interface Notification {
 }
 
 class NotificationService {
+  private VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
+
   /**
-   * Register for web push notifications
+   * Register for web push notifications using Web Push API
    */
   async registerForPushNotifications(): Promise<string | null> {
     try {
+      // Check if browser supports service workers and push
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        console.log('This browser does not support service workers or push notifications');
+        return null;
+      }
+
       // Check if browser supports notifications
       if (!('Notification' in window)) {
         console.log('This browser does not support notifications');
@@ -43,28 +51,76 @@ class NotificationService {
         return null;
       }
 
-      // For web, we'll use a simple token generation
-      // In production, you'd use a service worker and VAPID keys
-      // For now, we'll generate a unique token based on user agent and time
-      const token = `web_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      // Register token with backend
+      // Register service worker
+      let registration;
       try {
-        await api.post('/users/push-token', {
-          pushToken: token,
-          platform: 'web'
+        registration = await navigator.serviceWorker.register('/sw.js', {
+          scope: '/'
         });
-        console.log('Push token registered:', token);
-        localStorage.setItem('admin_push_token', token);
-        return token;
+        console.log('Service worker registered:', registration.scope);
       } catch (error) {
-        console.error('Error registering push token:', error);
+        console.error('Service worker registration failed:', error);
         return null;
       }
-    } catch (error) {
-      console.error('Error requesting notification permission:', error);
+
+      // Wait for service worker to be ready
+      await navigator.serviceWorker.ready;
+
+      // Check if already subscribed
+      let subscription = await registration.pushManager.getSubscription();
+      
+      if (!subscription) {
+        // Subscribe to push notifications
+        if (!this.VAPID_PUBLIC_KEY) {
+          console.error('VAPID_PUBLIC_KEY not configured. Please set VITE_VAPID_PUBLIC_KEY in .env');
+          return null;
+        }
+
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(this.VAPID_PUBLIC_KEY)
+        });
+        console.log('Push subscription created');
+      } else {
+        console.log('Already subscribed to push notifications');
+      }
+
+      // Send subscription to backend
+      try {
+        const subscriptionJson = subscription.toJSON();
+        await api.post('/users/push-subscription', {
+          subscription: subscriptionJson,
+          platform: 'web'
+        });
+        console.log('Push subscription registered with backend');
+        localStorage.setItem('admin_push_subscription', JSON.stringify(subscriptionJson));
+        return JSON.stringify(subscriptionJson);
+      } catch (error: any) {
+        console.error('Error registering push subscription:', error);
+        return null;
+      }
+    } catch (error: any) {
+      console.error('Error requesting push notifications:', error);
       return null;
     }
+  }
+
+  /**
+   * Convert VAPID public key from base64 URL to Uint8Array
+   */
+  private urlBase64ToUint8Array(base64String: string): Uint8Array {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
   }
 
   /**

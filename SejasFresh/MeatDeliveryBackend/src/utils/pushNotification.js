@@ -1,8 +1,21 @@
 const { Expo } = require('expo-server-sdk');
+const webpush = require('web-push');
 const User = require('../models/User');
 
 // Create a new Expo SDK client
 const expo = new Expo();
+
+// Configure Web Push VAPID keys (set these in environment variables)
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@sejas.com';
+
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+  console.log('✅ Web Push VAPID keys configured');
+} else {
+  console.warn('⚠️  Web Push VAPID keys not configured. Web push notifications will not work.');
+}
 
 /**
  * Send push notification to a user
@@ -14,17 +27,52 @@ const expo = new Expo();
  */
 const sendPushNotification = async (userId, title, body, data = {}) => {
   try {
-    // Get user and their push token
-    const user = await User.findById(userId).select('pushToken firstName');
+    // Get user and their push token/subscription
+    const user = await User.findById(userId).select('pushToken pushSubscription firstName');
     
     if (!user) {
       console.log(`User ${userId} not found`);
       return { success: false, error: 'User not found' };
     }
 
+    // Try Web Push first (for web browsers)
+    if (user.pushSubscription) {
+      try {
+        const subscription = typeof user.pushSubscription === 'string' 
+          ? JSON.parse(user.pushSubscription) 
+          : user.pushSubscription;
+        
+        const payload = JSON.stringify({
+          title: `Sejas Fresh: ${title}`,
+          body: body,
+          icon: '/favicon.png',
+          badge: '/favicon.png',
+          data: {
+            ...data,
+            userId: userId.toString(),
+            url: data.screen === 'orders' ? '/orders' : '/'
+          }
+        });
+
+        await webpush.sendNotification(subscription, payload);
+        console.log(`✅ Web push notification sent to user ${userId} (${user.firstName}): ${title}`);
+        return { success: true, method: 'web-push' };
+      } catch (error) {
+        console.error(`Web push error for user ${userId}:`, error);
+        // If subscription is invalid, remove it
+        if (error.statusCode === 410 || error.statusCode === 404) {
+          console.log(`Removing invalid subscription for user ${userId}`);
+          user.pushSubscription = null;
+          await user.save();
+        }
+        // Fall through to try Expo token
+      }
+    }
+
+    // Fallback to Expo Push (for mobile apps)
     if (!user.pushToken) {
-      console.log(`No push token for user ${userId}`);
-      return { success: false, error: 'No push token' };
+      console.log(`No push token or subscription for user ${userId}`);
+      return { success: false, error: 'No push token or subscription' };
     }
 
     // Validate Expo push token
@@ -104,8 +152,8 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
       return { success: false, errors };
     }
 
-    console.log(`✅ Push notification sent to user ${userId} (${user.firstName}): ${title}`);
-    return { success: true, tickets };
+    console.log(`✅ Expo push notification sent to user ${userId} (${user.firstName}): ${title}`);
+    return { success: true, tickets, method: 'expo' };
 
   } catch (error) {
     console.error('Error in sendPushNotification:', error);
@@ -142,10 +190,18 @@ const sendPushNotificationToMultiple = async (userIds, title, body, data = {}) =
  */
 const sendPushNotificationToRole = async (role, title, body, data = {}) => {
   try {
-    const users = await User.find({ role, isActive: true, pushToken: { $ne: null } }).select('_id pushToken');
+    // Find users with either pushToken (mobile) or pushSubscription (web)
+    const users = await User.find({ 
+      role, 
+      isActive: true,
+      $or: [
+        { pushToken: { $ne: null } },
+        { pushSubscription: { $ne: null } }
+      ]
+    }).select('_id pushToken pushSubscription');
     
     if (users.length === 0) {
-      console.log(`No users with role '${role}' and push tokens found`);
+      console.log(`No users with role '${role}' and push tokens/subscriptions found`);
       return { success: false, error: 'No users found' };
     }
 

@@ -57,6 +57,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  pushSubscription: {
+    type: mongoose.Schema.Types.Mixed, // Store Web Push subscription object
+    default: null
+  },
   otp: {
     code: String,
     expiresAt: Date
