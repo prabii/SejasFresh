@@ -9,11 +9,16 @@ import CouponsPage from './pages/CouponsPage';
 import Layout from './components/Layout/Layout';
 
 function App() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Routes>
-      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" />} />
+      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />} />
       
       {isAuthenticated ? (
         <Route element={<Layout />}>
@@ -24,7 +29,7 @@ function App() {
           <Route path="/coupons" element={<CouponsPage />} />
         </Route>
       ) : (
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       )}
     </Routes>
   );

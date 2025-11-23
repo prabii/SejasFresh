@@ -27,10 +27,12 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      navigate('/');
+      // Wait a bit to ensure state is updated before navigation
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 100);
     } catch (err: any) {
       setError(err.message || 'Login failed');
-    } finally {
       setLoading(false);
     }
   };
