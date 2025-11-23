@@ -54,23 +54,51 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     try {
       console.log('Admin login attempt:', email);
-      const response = await api.post('/auth/login', { email, password });
+      
+      // Make login request without token (public endpoint)
+      const response = await api.post('/auth/login', { email, password }, {
+        headers: {
+          Authorization: undefined // Ensure no token is sent for login
+        }
+      });
+      
       console.log('Login response:', response.data);
       
-      if (response.data.success) {
+      if (response.data.success && response.data.token) {
         if (response.data.user.role !== 'admin') {
           console.error('Login failed: User role is not admin:', response.data.user.role);
           throw new Error('Access denied. Admin role required.');
         }
+        
+        // Save token first
         localStorage.setItem('admin_token', response.data.token);
+        console.log('Token saved to localStorage');
+        
+        // Set user state - this will trigger re-render
         setUser(response.data.user);
-        console.log('Admin login successful, token saved');
+        console.log('User state updated:', response.data.user);
+        
+        // Wait a moment for state to propagate
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
+        console.log('Admin login successful');
       } else {
-        throw new Error(response.data.message || 'Login failed');
+        throw new Error(response.data.message || 'Login failed - invalid response');
       }
     } catch (error: any) {
-      console.error('Login error:', error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || error.message || 'Login failed');
+      console.error('Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url
+      });
+      
+      // Clear any stale tokens
+      localStorage.removeItem('admin_token');
+      setUser(null);
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+      throw new Error(errorMessage);
     }
   };
 

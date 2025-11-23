@@ -13,12 +13,25 @@ function App() {
 
   // Show loading state while checking authentication
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Loading...
+      </div>
+    );
   }
 
   return (
     <Routes>
-      <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />} />
+      <Route 
+        path="/login" 
+        element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />} 
+      />
       
       {isAuthenticated ? (
         <Route element={<Layout />}>

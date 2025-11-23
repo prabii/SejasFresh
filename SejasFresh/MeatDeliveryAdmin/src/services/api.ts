@@ -42,9 +42,13 @@ api.interceptors.response.use(
       console.error('API Error:', error.message);
     }
 
-    if (error.response?.status === 401) {
+    // Don't redirect on 401 for login endpoint (it's expected to fail there)
+    if (error.response?.status === 401 && !error.config?.url?.includes('/auth/login')) {
       localStorage.removeItem('admin_token');
-      window.location.href = '/login';
+      // Only redirect if not already on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
