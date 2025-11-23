@@ -20,6 +20,7 @@ import { addressService } from '../services/addressService';
 import { Cart, CartItem, cartService } from '../services/cartService';
 import { couponService, CouponValidationResponse } from '../services/couponService';
 import { Product, productService } from '../services/productService';
+import { getProductImageSource } from '../utils/imageUtils';
 import CouponSuccessScreen from './CouponSuccessScreen';
 
 const RED_COLOR = '#D13635';
@@ -178,7 +179,6 @@ const CartItemCard: React.FC<{
 
   // Get image source - use backend image URL or fallback to local
   const getImageSource = () => {
-    const { getProductImageSource } = require('../utils/imageUtils');
     return getProductImageSource(item.product);
   };
 
@@ -646,9 +646,12 @@ const CartPage: React.FC = () => {
     try {
       setLoading(true);
       const cartData = await cartService.getCart();
-      setCart(cartData);
-    } catch (error) {
+      // Ensure cart is set even if it's empty
+      setCart(cartData || { items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart);
+    } catch (error: any) {
       console.error('Error loading cart:', error);
+      // Set empty cart on error to prevent blank screen
+      setCart({ items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart);
     } finally {
       setLoading(false);
     }
@@ -745,6 +748,9 @@ const CartPage: React.FC = () => {
     }
   };
 
+  // Ensure cart is never null
+  const safeCart = cart || { items: [], totalItems: 0, totalAmount: 0, subtotal: 0, discountAmount: 0, finalAmount: 0, formattedTotal: '₹0.00' } as Cart;
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -769,25 +775,30 @@ const CartPage: React.FC = () => {
         {/* Cart Items */}
         <View style={styles.cartItemsSection}>
           {(() => {
-            const validItems = cart?.items.filter(item => item.product !== null) || [];
-            // If all products are normal (category === 'normal'), show 60-90 min, else next day
-            const allNormal = validItems.length > 0 && validItems.every(item => item.product?.category === 'normal');
-            const deliveryInfo = allNormal
-              ? 'Will be delivered in 60-90 min'
-              : 'Will be delivered next day';
-            return validItems.map(item => (
-              <CartItemCard
-                key={item._id}
-                item={item}
-                onUpdateQuantity={updateQuantity}
-                onRemove={removeItem}
-                deliveryInfo={deliveryInfo}
-              />
-            ));
+            try {
+              const validItems = safeCart.items?.filter(item => item && item.product !== null && item.product !== undefined) || [];
+              // If all products are normal (category === 'normal'), show 60-90 min, else next day
+              const allNormal = validItems.length > 0 && validItems.every(item => item.product?.category === 'normal');
+              const deliveryInfo = allNormal
+                ? 'Will be delivered in 60-90 min'
+                : 'Will be delivered next day';
+              return validItems.map(item => (
+                <CartItemCard
+                  key={item._id}
+                  item={item}
+                  onUpdateQuantity={updateQuantity}
+                  onRemove={removeItem}
+                  deliveryInfo={deliveryInfo}
+                />
+              ));
+            } catch (error) {
+              console.error('Error rendering cart items:', error);
+              return null;
+            }
           })()}
           
           {/* Handle empty cart or all items unavailable */}
-          {(!cart || cart.items.length === 0) && (
+          {(!safeCart.items || safeCart.items.length === 0) && (
             <View style={styles.emptyCart}>
               <Text style={styles.emptyCartText}>Your cart is empty</Text>
               <Text style={styles.emptyCartSubtext}>Add some delicious items to get started!</Text>
@@ -795,7 +806,7 @@ const CartPage: React.FC = () => {
           )}
           
           {/* Handle case when cart has items but all products are null */}
-          {cart && cart.items.length > 0 && cart.items.every(item => item.product === null) && (
+          {safeCart.items && safeCart.items.length > 0 && safeCart.items.every(item => !item.product) && (
             <View style={styles.unavailableCart}>
               <Ionicons name="sad-outline" size={48} color="#ff6b6b" />
               <Text style={styles.unavailableTitle}>All items are unavailable</Text>
@@ -844,16 +855,16 @@ const CartPage: React.FC = () => {
         </View>
         
         {/* Coupon and Summary - only show if there are valid items */}
-        {cart && cart.items.length > 0 && cart.items.some(item => item.product !== null) && (
+        {safeCart.items && safeCart.items.length > 0 && safeCart.items.some(item => item.product !== null) && (
           <CouponAndSummary 
-            cartItems={cart.items.filter(item => item.product !== null)} 
-            cart={cart}
+            cartItems={safeCart.items.filter(item => item.product !== null)} 
+            cart={safeCart}
             onCouponApplied={loadCartData}
           />
         )}
         
         {/* Proceed Button - only show if there are valid items */}
-        {cart && cart.items.length > 0 && cart.items.some(item => item.product !== null) && (
+        {safeCart.items && safeCart.items.length > 0 && safeCart.items.some(item => item.product !== null) && (
           <TouchableOpacity 
             style={styles.proceedButton} 
             onPress={handleProceed}
