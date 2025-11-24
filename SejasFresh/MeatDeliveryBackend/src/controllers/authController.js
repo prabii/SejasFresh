@@ -620,17 +620,63 @@ exports.updateProfile = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
 
-    if (firstName) user.firstName = firstName;
-    if (lastName) user.lastName = lastName;
-    if (phone) user.phone = phone;
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
 
+    // Update firstName if provided
+    if (firstName) {
+      user.firstName = firstName.trim();
+    }
+
+    // Update lastName if provided
+    if (lastName !== undefined) {
+      user.lastName = lastName.trim();
+    }
+
+    // Update phone if provided and different from current
+    if (phone && phone.trim() !== user.phone) {
+      const phoneNumber = phone.trim();
+      
+      // Check if phone number already exists for another user
+      const existingUser = await User.findOne({ 
+        phone: phoneNumber,
+        _id: { $ne: user._id } // Exclude current user
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Phone number is already registered with another account'
+        });
+      }
+
+      user.phone = phoneNumber;
+    }
+
+    // Save user
     await user.save();
+
+    // Return updated user without sensitive fields
+    const userResponse = await User.findById(user._id).select('-password -pin -otp');
 
     res.json({
       success: true,
-      user
+      message: 'Profile updated successfully',
+      user: userResponse
     });
   } catch (error) {
+    // Handle duplicate key error specifically
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        success: false,
+        message: `${field === 'phone' ? 'Phone number' : 'Email'} is already registered with another account`
+      });
+    }
     next(error);
   }
 };
