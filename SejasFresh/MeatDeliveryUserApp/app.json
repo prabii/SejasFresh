@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.batman1428.MeatDeliveryUserApp",
+      "bundleIdentifier": "com.sejasfresh.app",
       "buildNumber": "1",
       "infoPlist": {
         "NSUserTrackingUsageDescription": "This app uses notifications to keep you informed about your orders and offers.",
@@ -27,7 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.batman1428.MeatDeliveryUserApp",
+      "package": "com.sejasfresh.app",
       "versionCode": 2,
       "allowBackup": false,
       "notification": {
