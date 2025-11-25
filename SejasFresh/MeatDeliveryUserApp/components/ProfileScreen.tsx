@@ -101,7 +101,6 @@ const ProfileHeader: React.FC = () => {
 // ProfileCard Component
 const ProfileCard: React.FC = () => {
   const { user } = useAuth();
-  const [loading] = useState(false); // No longer needed, but keep for UI consistency
 
   // Generate user initials from first and last name or fullName
   const getUserInitials = () => {
@@ -119,8 +118,20 @@ const ProfileCard: React.FC = () => {
     return 'GU';
   };
 
-  // Format address display
-
+  // Don't render if user is not loaded
+  if (!user) {
+    return (
+      <View style={styles.profileCard}>
+        <View style={styles.profileImageContainer}>
+          <Text style={styles.initialsText}>...</Text>
+        </View>
+        <View style={styles.profileInfo}>
+          <Text style={styles.profileName}>Loading...</Text>
+          <Text style={styles.profileEmail}>Loading user data...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.profileCard}>
@@ -139,7 +150,6 @@ const ProfileCard: React.FC = () => {
         <Text style={styles.profilePhone}>
           {user?.phone || 'No phone available'}
         </Text>
-        {loading && <Text style={{ color: '#999', marginTop: 8 }}>Refreshing...</Text>}
       </View>
     </View>
   );
