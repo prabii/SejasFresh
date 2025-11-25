@@ -363,7 +363,9 @@ const ProfileStats: React.FC = () => {
 
 // Main ProfileScreen Component
 const ProfileScreen: React.FC = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, isLoading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   // Fetch user details from backend on screen focus
   useFocusEffect(
@@ -371,6 +373,7 @@ const ProfileScreen: React.FC = () => {
       let isActive = true;
       const fetchUser = async () => {
         try {
+          setLoading(true);
           const response = await authService.getMe();
           console.log('authService.getMe() response:', response);
           const userData = (response && ((response as any).data || response.user)) || null;
@@ -382,14 +385,39 @@ const ProfileScreen: React.FC = () => {
           }
         } catch (error) {
           console.error('Failed to fetch user details:', error);
+        } finally {
+          if (isActive) {
+            setLoading(false);
+            setInitialLoad(false);
+          }
         }
       };
-      fetchUser();
+      
+      // Only fetch if user is not loaded or needs refresh
+      if (!user || initialLoad) {
+        fetchUser();
+      } else {
+        setLoading(false);
+        setInitialLoad(false);
+      }
+      
       return () => {
         isActive = false;
       };
-  }, [updateUser, user])
+  }, [updateUser, user, initialLoad])
   );
+
+  // Show loading state while fetching user data
+  if (authLoading || (loading && initialLoad && !user)) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ProfileHeader />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -690,6 +718,19 @@ const styles = StyleSheet.create({
   versionText: {
     fontSize: 14,
     color: '#999',
+  },
+
+  // Loading Styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
   },
 });
 
