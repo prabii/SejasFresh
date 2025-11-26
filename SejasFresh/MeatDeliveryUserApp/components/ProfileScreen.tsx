@@ -377,6 +377,7 @@ const ProfileScreen: React.FC = () => {
   const { user, updateUser, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
+  const [isInitialMount, setIsInitialMount] = useState(true);
 
   // Fetch user details from backend on screen focus
   useFocusEffect(
@@ -384,6 +385,13 @@ const ProfileScreen: React.FC = () => {
       let isActive = true;
       const fetchUser = async () => {
         try {
+          // On first mount, wait a bit for AuthContext to finish loading
+          if (isInitialMount && authLoading) {
+            // Wait for auth to finish loading
+            await new Promise(resolve => setTimeout(resolve, 100));
+            if (!isActive) return;
+          }
+          
           setLoading(true);
           const response = await authService.getMe();
           console.log('authService.getMe() response:', response);
@@ -402,6 +410,7 @@ const ProfileScreen: React.FC = () => {
           if (isActive) {
             setLoading(false);
             setHasFetched(true);
+            setIsInitialMount(false);
           }
         }
       };
@@ -413,12 +422,20 @@ const ProfileScreen: React.FC = () => {
       return () => {
         isActive = false;
       };
-  }, [updateUser])
+  }, [updateUser, authLoading, isInitialMount])
   );
 
-  // Show loading state while fetching user data or if auth is loading
-  // Also show loading if we haven't fetched yet and user is null
-  if (authLoading || (loading && !hasFetched) || (!user && !hasFetched)) {
+  // Show loading state if:
+  // 1. Auth is still loading (on app start)
+  // 2. We're fetching and haven't completed yet
+  // 3. User is null and we haven't fetched yet (first time)
+  // 4. User is null and auth is still loading
+  const shouldShowLoading = authLoading || 
+                            (loading && !hasFetched) || 
+                            (!user && !hasFetched) ||
+                            (!user && authLoading);
+
+  if (shouldShowLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <ProfileHeader />
