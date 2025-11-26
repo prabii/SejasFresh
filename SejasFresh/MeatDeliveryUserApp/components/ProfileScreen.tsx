@@ -118,16 +118,17 @@ const ProfileCard: React.FC = () => {
     return 'GU';
   };
 
-  // Don't render if user is not loaded
+  // Show placeholder if user is not loaded yet
+  // This should rarely happen as parent component handles loading state
   if (!user) {
     return (
       <View style={styles.profileCard}>
         <View style={styles.profileImageContainer}>
-          <Text style={styles.initialsText}>...</Text>
+          <Text style={styles.initialsText}>GU</Text>
         </View>
         <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>Loading...</Text>
-          <Text style={styles.profileEmail}>Loading user data...</Text>
+          <Text style={styles.profileName}>Guest User</Text>
+          <Text style={styles.profileEmail}>Please login to view profile</Text>
         </View>
       </View>
     );
