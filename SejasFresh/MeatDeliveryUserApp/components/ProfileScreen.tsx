@@ -375,7 +375,7 @@ const ProfileStats: React.FC = () => {
 const ProfileScreen: React.FC = () => {
   const { user, updateUser, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
 
   // Fetch user details from backend on screen focus
   useFocusEffect(
@@ -388,37 +388,36 @@ const ProfileScreen: React.FC = () => {
           console.log('authService.getMe() response:', response);
           const userData = (response && ((response as any).data || response.user)) || null;
           if (response && response.success && userData && isActive) {
-            // Only update if user data is different
-            if (!user || user._id !== userData._id || user.email !== userData.email || user.updatedAt !== userData.updatedAt) {
-              updateUser(userData);
-            }
+            // Update user data
+            updateUser(userData);
+          } else if (response && !response.success && isActive) {
+            // If API call failed, but we have cached user, keep it
+            console.warn('Failed to fetch user, using cached data if available');
           }
         } catch (error) {
           console.error('Failed to fetch user details:', error);
+          // On error, if we have cached user, keep showing it
         } finally {
           if (isActive) {
             setLoading(false);
-            setInitialLoad(false);
+            setHasFetched(true);
           }
         }
       };
       
-      // Only fetch if user is not loaded or needs refresh
-      if (!user || initialLoad) {
-        fetchUser();
-      } else {
-        setLoading(false);
-        setInitialLoad(false);
-      }
+      // Always fetch user data when screen comes into focus
+      // This ensures fresh data and handles cases where user might be null
+      fetchUser();
       
       return () => {
         isActive = false;
       };
-  }, [updateUser, user, initialLoad])
+  }, [updateUser])
   );
 
-  // Show loading state while fetching user data
-  if (authLoading || (loading && initialLoad && !user)) {
+  // Show loading state while fetching user data or if auth is loading
+  // Also show loading if we haven't fetched yet and user is null
+  if (authLoading || (loading && !hasFetched) || (!user && !hasFetched)) {
     return (
       <SafeAreaView style={styles.container}>
         <ProfileHeader />
