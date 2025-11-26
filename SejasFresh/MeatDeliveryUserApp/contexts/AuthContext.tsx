@@ -66,6 +66,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
+      // First, try to load cached user data for immediate UI display
+      // This prevents blank screens while fetching from backend
+      try {
+        const cachedUserData = await AsyncStorage.getItem('userData');
+        if (cachedUserData) {
+          const parsedUser = JSON.parse(cachedUserData);
+          // Set cached user immediately for better UX
+          setUser(parsedUser);
+        }
+      } catch (e) {
+        console.log('No cached user data found');
+      }
+      
       // First check if we have a valid token
       const isAuth = await authService.isAuthenticated();
       
@@ -79,11 +92,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // We have a valid token - try to get fresh user data from backend
-      // Don't set cached user first - validate with backend first
+      // Cached user is already set above, so UI won't be blank
       try {
         const response = await authService.getMe();
         if (response.success && response.user) {
-          // Got fresh user data - use it
+          // Got fresh user data - use it (replaces cached data)
           const fetchedUser = response.user;
           setUser(fetchedUser);
           // Persist updated user data
@@ -98,30 +111,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
         }
       } catch (error: any) {
-        // If getMe fails, the token is likely invalid - clear everything
+        // If getMe fails, check if it's an auth error
         const isAuthError = error.message?.includes('authorized') || error.message?.includes('Not authenticated');
         
         if (isAuthError) {
+          // Token is invalid - clear everything
           console.log('Token validation failed - clearing auth');
+          await authService.logout();
+          await AsyncStorage.removeItem('userData');
+          setUser(null);
         } else {
-          console.error('Failed to validate token:', error);
+          // Network error or other issue - keep cached user if available
+          console.error('Failed to validate token (network error):', error);
+          // Don't clear user on network errors - keep cached data
+          // User will be updated on next successful fetch
         }
-        
-        // Always clear on error - don't keep cached user
-        await authService.logout();
-        await AsyncStorage.removeItem('userData');
-        setUser(null);
       }
     } catch (error) {
       console.error('Auth check error:', error);
-      // On any error, clear authentication state
+      // On any error, try to keep cached user if available
+      // Only clear if it's a critical error
       try {
-        await authService.logout();
+        const cachedUserData = await AsyncStorage.getItem('userData');
+        if (!cachedUserData) {
+          // No cached data and error occurred - clear auth
+          await authService.logout();
+          setUser(null);
+        }
+        // If cached data exists, keep it
       } catch (e) {
-        console.error('Error during logout after auth check failure:', e);
+        console.error('Error during error handling:', e);
+        setUser(null);
       }
-      await AsyncStorage.removeItem('userData');
-      setUser(null);
     } finally {
       // Always stop loading
       setIsLoading(false);

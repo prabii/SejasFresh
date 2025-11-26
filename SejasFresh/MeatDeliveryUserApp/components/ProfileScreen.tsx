@@ -426,14 +426,14 @@ const ProfileScreen: React.FC = () => {
   );
 
   // Show loading state if:
-  // 1. Auth is still loading (on app start)
-  // 2. We're fetching and haven't completed yet
+  // 1. Auth is still loading (on app start) - CRITICAL: wait for this
+  // 2. We're fetching and haven't completed yet AND user is null
   // 3. User is null and we haven't fetched yet (first time)
-  // 4. User is null and auth is still loading
+  // Never show blank - always show loading if user is null and we're still initializing
   const shouldShowLoading = authLoading || 
-                            (loading && !hasFetched) || 
+                            (loading && !hasFetched && !user) || 
                             (!user && !hasFetched) ||
-                            (!user && authLoading);
+                            (!user && loading);
 
   if (shouldShowLoading) {
     return (
@@ -442,6 +442,42 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading profile...</Text>
         </View>
+      </SafeAreaView>
+    );
+  }
+
+  // If user is still null after all loading is done, show placeholder
+  // This should rarely happen, but prevents blank screen
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ProfileHeader />
+        <ScrollView 
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <ProfileCard />
+          <ProfileStats />
+          <View style={styles.menuContainer}>
+            <Text style={styles.menuSectionTitle}>Account</Text>
+            <View style={styles.menuList}>
+              {profileMenuData.map((item, index) => (
+                <ProfileMenuItem
+                  key={item.id}
+                  iconName={item.iconName}
+                  title={item.title}
+                  iconType={item.iconType}
+                  isLast={index === profileMenuData.length - 1}
+                />
+              ))}
+            </View>
+          </View>
+          <View style={styles.appInfo}>
+            <Text style={styles.appInfoText}>Seja&apos;s Absolute Fresh</Text>
+            <Text style={styles.versionText}>Version 1.0.0</Text>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
