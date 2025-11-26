@@ -32,7 +32,10 @@
       "android": {
         "buildType": "app-bundle",
         "gradleCommand": ":app:bundleRelease",
-        "image": "latest"
+        "image": "latest",
+        "env": {
+          "EXPO_OPTIMIZE": "true"
+        }
       },
       "ios": {
         "distribution": "store"

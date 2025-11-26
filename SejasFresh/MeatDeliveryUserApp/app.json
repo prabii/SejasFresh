@@ -28,8 +28,10 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.sejasfresh.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "allowBackup": false,
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResourcesInReleaseBuilds": true,
       "notification": {
         "icon": "./assets/images/notification-icon.png",
         "color": "#D13635",
