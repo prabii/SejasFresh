@@ -46,7 +46,8 @@
   "submit": {
     "production": {
       "android": {
-        "track": "production"
+        "track": "production",
+        "deobfuscationFile": "mapping.txt"
       }
     }
   }
