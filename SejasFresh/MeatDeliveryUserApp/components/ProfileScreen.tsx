@@ -105,16 +105,43 @@ const ProfileCard: React.FC = () => {
   // Generate user initials from first and last name or fullName
   const getUserInitials = () => {
     if (!user) return 'GU';
-    if (user.firstName && user.lastName) {
-      return `${user.firstName.charAt(0).toUpperCase()}${user.lastName.charAt(0).toUpperCase()}`;
-    }
-    if (user.fullName && typeof user.fullName === 'string') {
-      const parts = user.fullName.split(' ');
-      if (parts.length >= 2) {
-        return `${parts[0][0].toUpperCase()}${parts[1][0].toUpperCase()}`;
+    
+    // Try firstName and lastName first
+    if (user.firstName && typeof user.firstName === 'string' && user.firstName.trim().length > 0 &&
+        user.lastName && typeof user.lastName === 'string' && user.lastName.trim().length > 0) {
+      const firstInitial = user.firstName.trim().charAt(0).toUpperCase();
+      const lastInitial = user.lastName.trim().charAt(0).toUpperCase();
+      if (firstInitial && lastInitial) {
+        return `${firstInitial}${lastInitial}`;
       }
-      return parts[0][0].toUpperCase();
     }
+    
+    // Try fullName if firstName/lastName didn't work
+    if (user.fullName && typeof user.fullName === 'string' && user.fullName.trim().length > 0) {
+      const parts = user.fullName.trim().split(' ').filter(part => part.length > 0);
+      if (parts.length >= 2) {
+        const firstInitial = parts[0].charAt(0).toUpperCase();
+        const secondInitial = parts[1].charAt(0).toUpperCase();
+        if (firstInitial && secondInitial) {
+          return `${firstInitial}${secondInitial}`;
+        }
+      } else if (parts.length === 1 && parts[0].length > 0) {
+        const initial = parts[0].charAt(0).toUpperCase();
+        if (initial) {
+          return initial;
+        }
+      }
+    }
+    
+    // Try email as fallback
+    if (user.email && typeof user.email === 'string' && user.email.trim().length > 0) {
+      const emailInitial = user.email.trim().charAt(0).toUpperCase();
+      if (emailInitial) {
+        return emailInitial;
+      }
+    }
+    
+    // Default fallback
     return 'GU';
   };
 
