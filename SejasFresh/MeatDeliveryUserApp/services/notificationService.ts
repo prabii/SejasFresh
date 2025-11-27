@@ -23,25 +23,31 @@ const getApiUrl = () => {
 
 const API_BASE_URL = getApiUrl();
 
+// Check if running in Expo Go (push notifications not supported in SDK 53+)
+const isExpoGo = Constants.executionEnvironment === 'storeClient';
+
 // Configure how notifications are handled when received
 // This ensures notifications show as system notifications (like Snapchat)
-Notifications.setNotificationHandler({
-  handleNotification: async (notification) => {
-    // Customize notification title to include app name
-    // In production builds, this will show "Sejas Fresh" instead of "Expo Go"
-    const customTitle = notification.request.content.title || 'Sejas Fresh';
-    const customSubtitle = notification.request.content.subtitle || 'Sejas Fresh';
-    
-    // Always show as system notification, even when app is closed
-    return {
-      shouldShowAlert: true,      // Show alert/system notification
-      shouldPlaySound: true,       // Play sound
-      shouldSetBadge: true,        // Update badge count
-      shouldShowBanner: true,      // Show banner in foreground
-      shouldShowList: true,        // Show in notification list/center
-    };
-  },
-});
+// Only set handler if not in Expo Go (to avoid warnings)
+if (!isExpoGo) {
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => {
+      // Customize notification title to include app name
+      // In production builds, this will show "Sejas Fresh" instead of "Expo Go"
+      const customTitle = notification.request.content.title || 'Sejas Fresh';
+      const customSubtitle = notification.request.content.subtitle || 'Sejas Fresh';
+      
+      // Always show as system notification, even when app is closed
+      return {
+        shouldShowAlert: true,      // Show alert/system notification
+        shouldPlaySound: true,       // Play sound
+        shouldSetBadge: true,        // Update badge count
+        shouldShowBanner: true,       // Show banner in foreground
+        shouldShowList: true,        // Show in notification list/center
+      };
+    },
+  });
+}
 
 export interface NotificationItem {
   _id: string;
@@ -163,9 +169,22 @@ class NotificationService {
   // ===== EXPO PUSH NOTIFICATIONS METHODS =====
 
   /**
+   * Check if running in Expo Go (push notifications not supported)
+   */
+  private isExpoGo(): boolean {
+    return isExpoGo;
+  }
+
+  /**
    * Register for push notifications and get push token
    */
   async registerForPushNotifications(): Promise<string | null> {
+    // Skip push notification registration in Expo Go (not supported in SDK 53+)
+    if (this.isExpoGo()) {
+      console.log('⚠️ Push notifications are not supported in Expo Go. Use a development build instead.');
+      return null;
+    }
+
     let token = null;
 
     if (Platform.OS === 'android') {
