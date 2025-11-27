@@ -127,12 +127,12 @@ const EditProfileScreen: React.FC = () => {
     try {
       setLoading(true);
 
-      // Check if any changes were made
+      // Check if any changes were made (exclude phone since it's read-only)
+      const currentPhone = user?.phone?.replace(/^\+91/, '') || '';
       const hasChanges = 
         formData.firstName !== user?.firstName ||
         formData.lastName !== user?.lastName ||
-        formData.phone !== user?.phone ||
-        formData.street !== (typeof user?.address === 'object' ? user?.address?.street : user?.address) ||
+        formData.street !== (typeof user?.address === 'object' ? user?.address?.street : user?.address || '') ||
         formData.city !== (typeof user?.address === 'object' ? user?.address?.city : '') ||
         formData.state !== (typeof user?.address === 'object' ? user?.address?.state : '') ||
         formData.zipCode !== (typeof user?.address === 'object' ? user?.address?.zipCode : '');
@@ -143,10 +143,10 @@ const EditProfileScreen: React.FC = () => {
       }
 
       // Prepare data for API call
-      const profileData = {
+      // Don't send phone number since it's read-only and can't be changed
+      const profileData: any = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        phone: formData.phone.trim(),
         address: {
           street: formData.street.trim(),
           city: formData.city.trim(),
@@ -168,11 +168,28 @@ const EditProfileScreen: React.FC = () => {
           },
         ]
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error);
+      
+      // Handle specific error messages
+      let errorMessage = 'Failed to update your profile. Please try again.';
+      
+      if (error?.message) {
+        const errorMsg = error.message.toLowerCase();
+        if (errorMsg.includes('duplicate') || errorMsg.includes('already exists')) {
+          errorMessage = 'This information is already in use by another account. Please use different details.';
+        } else if (errorMsg.includes('validation') || errorMsg.includes('invalid')) {
+          errorMessage = 'Please check your information and try again.';
+        } else if (errorMsg.includes('network') || errorMsg.includes('connection')) {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       Alert.alert(
         'Error',
-        'Failed to update your profile. Please try again.',
+        errorMessage,
         [{ text: 'OK' }]
       );
     } finally {

@@ -210,10 +210,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await AsyncStorage.setItem('userData', JSON.stringify(updatedUser));
         }
       } else {
-        throw new Error(response.message || 'Failed to update profile');
+        // Extract error message from response
+        const errorMessage = response.message || 'Failed to update profile';
+        const error = new Error(errorMessage);
+        // Preserve the original error details
+        (error as any).response = response;
+        throw error;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating user profile:', error);
+      // Re-throw with better error message if available
+      if (error?.response?.message) {
+        throw new Error(error.response.message);
+      }
       throw error;
     }
   };
