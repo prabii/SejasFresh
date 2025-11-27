@@ -31,7 +31,7 @@ const isExpoGo = Constants.executionEnvironment === 'storeClient';
 // Only set handler if not in Expo Go (to avoid warnings)
 if (!isExpoGo) {
   Notifications.setNotificationHandler({
-    handleNotification: async (notification) => {
+    handleNotification: async (notification: Notifications.Notification) => {
       // Customize notification title to include app name
       // In production builds, this will show "Sejas Fresh" instead of "Expo Go"
       const customTitle = notification.request.content.title || 'Sejas Fresh';
@@ -575,7 +575,10 @@ class NotificationService {
       console.log('🗑️ Final URL:', url);
       
       const headers = await this.getAuthHeaders();
-      console.log('Headers:', { ...headers, Authorization: headers.Authorization ? 'Bearer ***' : 'none' });
+      const authHeader = Array.isArray(headers) 
+        ? headers.find(([key]) => key.toLowerCase() === 'authorization')?.[1]
+        : (headers as Record<string, string>)['Authorization'];
+      console.log('Headers:', { ...headers, Authorization: authHeader ? 'Bearer ***' : 'none' });
       
       const response = await fetch(url, {
         method: 'DELETE',
