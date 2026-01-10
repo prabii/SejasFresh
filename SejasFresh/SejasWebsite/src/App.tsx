@@ -4,6 +4,7 @@ import './App.css'
 // APK Download URL - GitHub Releases Direct Download
 // Using GitHub Releases for instant, reliable downloads with no redirects
 // Release: https://github.com/prabii/SejasFresh/releases/tag/Sejas
+// If redirecting, try: SejasAPP or check the actual tag name in GitHub
 const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/Sejas.Fresh.apk'
 
 // Expo build page URL (for reference)
@@ -86,8 +87,9 @@ function App() {
     } catch (error) {
       console.log('Blob method failed, using direct download:', error)
       
-      // Method 2: Use window.location for direct download (forces download, not redirect)
-      // This is the most reliable method for GitHub Releases
+      // Method 2: Direct link with download attribute
+      // Note: Some browsers may still redirect for security reasons
+      // If this happens, users can right-click and "Save As"
       const link = document.createElement('a')
       link.href = APK_DOWNLOAD_URL
       link.download = 'Sejas.Fresh.apk'
@@ -103,6 +105,13 @@ function App() {
           document.body.removeChild(link)
         }
       }, 100)
+      
+      // If browser redirects, show a message after a short delay
+      setTimeout(() => {
+        // Check if we're still on the same page (not redirected)
+        // If redirected, the download didn't work as expected
+        console.log('Download initiated. If redirected, please right-click the download button and select "Save As"')
+      }, 500)
     } finally {
       setLoading(false)
     }
