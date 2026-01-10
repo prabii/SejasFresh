@@ -4,7 +4,7 @@ import './App.css'
 // APK Download URL - GitHub Releases Direct Download
 // Using GitHub Releases for instant, reliable downloads with no redirects
 // Release: https://github.com/prabii/SejasFresh/releases/tag/Sejas
-const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/SejasFresh.apk'
+const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/Sejas.Fresh.apk'
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
@@ -73,7 +73,7 @@ function App() {
       const blobUrl = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = blobUrl
-      link.download = 'SejasFresh.apk'
+      link.download = 'Sejas.Fresh.apk'
       link.style.display = 'none'
       
       // Append to body, click, and remove
