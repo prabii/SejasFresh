@@ -12,7 +12,7 @@ import './App.css'
 // 4. Use that exact URL below
 //
 // Common tag names: "Sejas", "SejasAPP", "v1.0.0"
-const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/SejasAPP/Sejas.Fresh.apk'
+const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/Sejas.Fresh.apk'
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
