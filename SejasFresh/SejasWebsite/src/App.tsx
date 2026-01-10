@@ -1,7 +1,20 @@
 import { useState } from 'react'
 import './App.css'
 
-// Expo build URL - this will be used to fetch the APK download link
+// Direct APK download URL - Update this with your direct APK link
+// 
+// Option 1: If you have the APK file hosted (e.g., on GitHub Releases, Google Drive, Dropbox, etc.)
+//          Paste the direct download URL here. Make sure it's a direct link (not a page that requires clicking)
+//          Example: 'https://github.com/username/repo/releases/download/v1.0/app.apk'
+//          Example: 'https://drive.google.com/uc?export=download&id=FILE_ID'
+//
+// Option 2: If using Expo build, you can use the download endpoint:
+//          'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d/download/android'
+//
+// Option 3: If you have the APK in the public folder, use: '/SejasFresh.apk'
+const DIRECT_APK_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d/download/android'
+
+// Expo build page URL (fallback)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
 
 function App() {
@@ -41,12 +54,27 @@ function App() {
     }
   ]
 
-  // Handle APK download
+  // Handle direct APK download
   const handleDownload = async () => {
     setLoading(true)
     try {
-      // Open the Expo build page where users can download the APK
-      window.open(EXPO_BUILD_URL, '_blank')
+      // Create a temporary anchor element to trigger download
+      const link = document.createElement('a')
+      link.href = DIRECT_APK_URL
+      link.download = 'SejasFresh.apk' // Set the filename for download
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // If direct download doesn't work, open the Expo page as fallback
+      // Some browsers may block direct downloads, so we also open the page
+      setTimeout(() => {
+        window.open(EXPO_BUILD_URL, '_blank')
+      }, 500)
     } catch (error) {
       console.error('Error downloading APK:', error)
       // Fallback: Open the Expo build page

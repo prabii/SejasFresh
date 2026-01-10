@@ -66,10 +66,38 @@ SejasWebsite/
 
 ## 🔗 APK Download
 
-The website includes a download button that links to:
-- Expo Build Page: `https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d`
+The website includes a download button that **directly downloads the APK file** when clicked.
 
-Users can click the download button to get the APK file.
+### Setting Up Direct APK Download
+
+You have three options:
+
+#### Option 1: Direct APK URL (Recommended)
+If you have the APK hosted somewhere (GitHub Releases, Google Drive, Dropbox, etc.), update the `DIRECT_APK_URL` in `src/App.tsx`:
+
+```typescript
+const DIRECT_APK_URL = 'https://your-hosted-apk-url.com/app.apk'
+```
+
+**Examples:**
+- GitHub Releases: `https://github.com/username/repo/releases/download/v1.0/SejasFresh.apk`
+- Google Drive: `https://drive.google.com/uc?export=download&id=FILE_ID`
+- Dropbox: `https://www.dropbox.com/s/xxxxx/app.apk?dl=1` (add `?dl=1` for direct download)
+
+#### Option 2: Host APK in Website
+1. Place your APK file in the `public` folder: `public/SejasFresh.apk`
+2. Update `DIRECT_APK_URL` in `src/App.tsx`:
+   ```typescript
+   const DIRECT_APK_URL = '/SejasFresh.apk'
+   ```
+
+#### Option 3: Expo Build Download
+Use the Expo build download endpoint (already configured):
+```typescript
+const DIRECT_APK_URL = 'https://expo.dev/.../download/android'
+```
+
+**Note:** The download button will trigger a direct download. If the browser blocks it, it will also open the Expo build page as a fallback.
 
 ## 🚀 Deployment
 
