@@ -1,17 +1,27 @@
 import { useState } from 'react'
 import './App.css'
 
-// APK Download URL - Use direct link from your website or hosting service
+// APK Download URL - Use direct link from hosting service
 // 
-// ⚡ RECOMMENDED: Host APK in public folder (fastest, no warnings)
-//    1. Place your APK file in: public/SejasFresh.apk
-//    2. Use: '/SejasFresh.apk' (already set below)
+// 🚀 RECOMMENDED OPTIONS (All support direct download, no redirects):
 //
-// Alternative: Use GitHub Releases or other direct hosting
-//    const APK_DOWNLOAD_URL = 'https://github.com/user/repo/releases/download/v1.0/SejasFresh.apk'
+// Option 1: GitHub Releases (BEST - Free, Fast, Reliable)
+//   1. Create release: https://github.com/prabii/SejasFresh/releases/new
+//   2. Upload APK file
+//   3. Copy download URL and paste below
+//   Example: 'https://github.com/prabii/SejasFresh/releases/download/v1.0.0/SejasFresh.apk'
 //
-// ⚠️ NOT RECOMMENDED: Google Drive (shows virus scan warnings and delays)
-const APK_DOWNLOAD_URL = '/SejasFresh.apk' // Direct from website - instant, no warnings
+// Option 2: Host in Website Public Folder
+//   1. Place APK in: public/SejasFresh.apk
+//   2. Use: '/SejasFresh.apk'
+//
+// Option 3: Cloudflare R2 / AWS S3 / Firebase Hosting
+//   Use direct CDN URL
+//
+// ⚠️ NOT RECOMMENDED: Google Drive (shows virus scan warnings)
+//
+// UPDATE THIS URL with your chosen hosting option:
+const APK_DOWNLOAD_URL = '/SejasFresh.apk' // Change to your direct download URL
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
