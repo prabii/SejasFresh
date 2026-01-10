@@ -1,18 +1,9 @@
 import { useState } from 'react'
 import './App.css'
 
-// Direct APK download URL - Update this with your direct APK link
-// 
-// Option 1: If you have the APK file hosted (e.g., on GitHub Releases, Google Drive, Dropbox, etc.)
-//          Paste the direct download URL here. Make sure it's a direct link (not a page that requires clicking)
-//          Example: 'https://github.com/username/repo/releases/download/v1.0/app.apk'
-//          Example: 'https://drive.google.com/uc?export=download&id=FILE_ID'
-//
-// Option 2: If using Expo build, you can use the download endpoint:
-//          'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d/download/android'
-//
-// Option 3: If you have the APK in the public folder, use: '/SejasFresh.apk'
-const DIRECT_APK_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d/download/android'
+// Direct APK download URL - Google Drive direct download link
+// Converted from: https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link
+const DIRECT_APK_URL = 'https://drive.google.com/uc?export=download&id=1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0'
 
 // Expo build page URL (fallback)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
@@ -58,9 +49,13 @@ function App() {
   const handleDownload = async () => {
     setLoading(true)
     try {
+      // For Google Drive, we need to handle it differently
+      // Google Drive direct download format: https://drive.google.com/uc?export=download&id=FILE_ID
+      const downloadUrl = DIRECT_APK_URL
+      
       // Create a temporary anchor element to trigger download
       const link = document.createElement('a')
-      link.href = DIRECT_APK_URL
+      link.href = downloadUrl
       link.download = 'SejasFresh.apk' // Set the filename for download
       link.target = '_blank'
       link.rel = 'noopener noreferrer'
@@ -70,15 +65,16 @@ function App() {
       link.click()
       document.body.removeChild(link)
       
-      // If direct download doesn't work, open the Expo page as fallback
-      // Some browsers may block direct downloads, so we also open the page
+      // For Google Drive, sometimes it redirects, so we also open in a new tab as backup
+      // This ensures the user can download even if the direct link doesn't work
       setTimeout(() => {
-        window.open(EXPO_BUILD_URL, '_blank')
-      }, 500)
+        // Open the original Google Drive link as fallback
+        window.open('https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link', '_blank')
+      }, 1000)
     } catch (error) {
       console.error('Error downloading APK:', error)
-      // Fallback: Open the Expo build page
-      window.open(EXPO_BUILD_URL, '_blank')
+      // Fallback: Open the Google Drive link
+      window.open('https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link', '_blank')
     } finally {
       setLoading(false)
     }
