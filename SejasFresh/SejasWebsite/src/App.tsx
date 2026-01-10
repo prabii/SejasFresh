@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import './App.css'
 
-// Google Drive file ID for direct download
-const GOOGLE_DRIVE_FILE_ID = '1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0'
+// APK Download URL - Use direct link from your website or hosting service
+// 
+// ⚡ RECOMMENDED: Host APK in public folder (fastest, no warnings)
+//    1. Place your APK file in: public/SejasFresh.apk
+//    2. Use: '/SejasFresh.apk' (already set below)
+//
+// Alternative: Use GitHub Releases or other direct hosting
+//    const APK_DOWNLOAD_URL = 'https://github.com/user/repo/releases/download/v1.0/SejasFresh.apk'
+//
+// ⚠️ NOT RECOMMENDED: Google Drive (shows virus scan warnings and delays)
+const APK_DOWNLOAD_URL = '/SejasFresh.apk' // Direct from website - instant, no warnings
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
@@ -50,15 +59,26 @@ function App() {
     }
   ]
 
-  // Handle direct APK download - no redirects, immediate download
+  // Handle direct APK download - instant download, no redirects, no warnings
   const handleDownload = async () => {
     setLoading(true)
     try {
-      // Use Google Drive direct download with confirm parameter to bypass virus scan warning
-      const directDownloadUrl = `https://drive.google.com/uc?export=download&id=${GOOGLE_DRIVE_FILE_ID}&confirm=t`
+      // Try direct download from website first (fastest, no warnings)
+      if (APK_DOWNLOAD_URL.startsWith('/')) {
+        // Local file from public folder
+        const link = document.createElement('a')
+        link.href = APK_DOWNLOAD_URL
+        link.download = 'SejasFresh.apk'
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        setLoading(false)
+        return
+      }
       
-      // Fetch the file as a blob for direct download
-      const response = await fetch(directDownloadUrl, {
+      // If using external URL, fetch as blob for direct download
+      const response = await fetch(APK_DOWNLOAD_URL, {
         method: 'GET',
         mode: 'cors',
       })
@@ -89,20 +109,8 @@ function App() {
       
     } catch (error) {
       console.error('Error downloading APK:', error)
-      // If fetch fails, try direct link download as fallback
-      try {
-        const directLink = `https://drive.google.com/uc?export=download&id=${GOOGLE_DRIVE_FILE_ID}&confirm=t`
-        const link = document.createElement('a')
-        link.href = directLink
-        link.download = 'SejasFresh.apk'
-        link.target = '_self'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      } catch (fallbackError) {
-        console.error('Fallback download also failed:', fallbackError)
-        alert('Download failed. Please try again or contact support.')
-      }
+      // Show user-friendly error message
+      alert('Download failed. Please ensure the APK file is available. If the problem persists, contact support.')
     } finally {
       setLoading(false)
     }

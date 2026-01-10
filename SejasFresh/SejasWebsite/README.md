@@ -66,38 +66,41 @@ SejasWebsite/
 
 ## 🔗 APK Download
 
-The website includes a download button that **directly downloads the APK file** when clicked.
+The website includes a download button that **directly downloads the APK file instantly** - no redirects, no warnings, no delays!
 
-### Setting Up Direct APK Download
+### ⚡ Recommended: Host APK in Website (Fastest & Best)
 
-You have three options:
+**This is the BEST solution - instant download with no warnings!**
 
-#### Option 1: Direct APK URL (Recommended)
-If you have the APK hosted somewhere (GitHub Releases, Google Drive, Dropbox, etc.), update the `DIRECT_APK_URL` in `src/App.tsx`:
+1. **Download your APK file** from Google Drive or Expo
+2. **Place it in the `public` folder**: `SejasWebsite/public/SejasFresh.apk`
+3. **That's it!** The code is already configured to use `/SejasFresh.apk`
 
-```typescript
-const DIRECT_APK_URL = 'https://your-hosted-apk-url.com/app.apk'
-```
+**Benefits:**
+- ✅ Instant download (no delays)
+- ✅ No virus scan warnings
+- ✅ No redirects
+- ✅ Works perfectly on all browsers
+- ✅ Professional user experience
 
-**Examples:**
-- GitHub Releases: `https://github.com/username/repo/releases/download/v1.0/SejasFresh.apk`
-- Google Drive: `https://drive.google.com/uc?export=download&id=FILE_ID`
-- Dropbox: `https://www.dropbox.com/s/xxxxx/app.apk?dl=1` (add `?dl=1` for direct download)
+### Alternative Options
 
-#### Option 2: Host APK in Website
-1. Place your APK file in the `public` folder: `public/SejasFresh.apk`
-2. Update `DIRECT_APK_URL` in `src/App.tsx`:
+#### Option 1: GitHub Releases (Good Alternative)
+1. Upload APK to GitHub Releases
+2. Update `APK_DOWNLOAD_URL` in `src/App.tsx`:
    ```typescript
-   const DIRECT_APK_URL = '/SejasFresh.apk'
+   const APK_DOWNLOAD_URL = 'https://github.com/username/repo/releases/download/v1.0/SejasFresh.apk'
    ```
 
-#### Option 3: Expo Build Download
-Use the Expo build download endpoint (already configured):
-```typescript
-const DIRECT_APK_URL = 'https://expo.dev/.../download/android'
-```
+#### Option 2: Other Hosting Services
+- **Dropbox**: `https://www.dropbox.com/s/xxxxx/app.apk?dl=1` (add `?dl=1`)
+- **AWS S3**: Direct link to your S3 bucket
+- **CDN**: Any CDN with direct file access
 
-**Note:** The download button will trigger a direct download. If the browser blocks it, it will also open the Expo build page as a fallback.
+#### Option 3: Google Drive (Not Recommended)
+⚠️ **Warning**: Google Drive shows virus scan warnings and causes delays. Only use as last resort.
+
+**Note:** The current code is set to use `/SejasFresh.apk` from the public folder. Just add your APK file there!
 
 ## 🚀 Deployment
 
