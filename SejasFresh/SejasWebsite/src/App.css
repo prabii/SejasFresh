@@ -33,6 +33,19 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-white);
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth scrolling */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Better touch targets for mobile */
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: rgba(209, 54, 53, 0.2);
+  touch-action: manipulation;
 }
 
 .app {
@@ -46,6 +59,19 @@ body {
   margin: 0 auto;
   padding: 0 24px;
   width: 100%;
+}
+
+/* Better container padding for mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
 }
 
 /* Navigation */
@@ -89,6 +115,21 @@ body {
   object-fit: contain;
 }
 
+@media (max-width: 480px) {
+  .logo {
+    font-size: 20px;
+    gap: 8px;
+  }
+  
+  .logo-image {
+    height: 32px;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+  }
+}
+
 .download-btn-nav {
   padding: 10px 24px;
   background: var(--gradient-1);
@@ -99,6 +140,8 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-md);
+  min-height: 44px; /* Better touch target */
+  white-space: nowrap;
 }
 
 .download-btn-nav:hover {
@@ -106,20 +149,48 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+.download-btn-nav:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
 .download-btn-nav:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .download-btn-nav {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-height: 40px;
+  }
 }
 
 /* Hero Section */
 .hero {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 120px 24px 80px;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding: 100px 20px 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 90px 16px 50px;
+    min-height: auto;
+  }
 }
 
 .hero-background {
@@ -260,6 +331,23 @@ body {
   animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
+@media (max-width: 768px) {
+  .hero-description {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-description {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 28px;
+    padding: 0 8px;
+  }
+}
+
 .hero-buttons {
   display: flex;
   gap: 16px;
@@ -272,6 +360,7 @@ body {
 .btn-primary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 16px 32px;
   background: var(--gradient-1);
@@ -283,6 +372,9 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-lg);
+  min-height: 56px; /* Better touch target */
+  width: 100%;
+  max-width: 300px;
 }
 
 .btn-primary:hover {
@@ -290,14 +382,37 @@ body {
   box-shadow: var(--shadow-xl);
 }
 
+.btn-primary:active {
+  transform: translateY(-2px);
+}
+
 .btn-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .btn-primary {
+    max-width: 100%;
+    font-size: 16px;
+    padding: 14px 28px;
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-primary {
+    font-size: 15px;
+    padding: 12px 24px;
+    min-height: 48px;
+  }
 }
 
 .btn-secondary {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 16px 32px;
   background: white;
@@ -309,11 +424,35 @@ body {
   text-decoration: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-height: 56px;
+  width: 100%;
+  max-width: 300px;
 }
 
 .btn-secondary:hover {
   background: var(--primary-red-light);
   transform: translateY(-4px);
+}
+
+.btn-secondary:active {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .btn-secondary {
+    max-width: 100%;
+    font-size: 16px;
+    padding: 14px 28px;
+    min-height: 52px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-secondary {
+    font-size: 15px;
+    padding: 12px 24px;
+    min-height: 48px;
+  }
 }
 
 .spinner {
@@ -339,6 +478,21 @@ body {
   animation: fadeInUp 0.8s ease-out 1s both;
 }
 
+@media (max-width: 768px) {
+  .hero-stats {
+    gap: 32px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-stats {
+    gap: 24px;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
 .stat-item {
   text-align: center;
 }
@@ -362,6 +516,20 @@ body {
 .features {
   padding: 100px 0;
   background: var(--bg-light);
+  scroll-margin-top: 80px; /* For smooth scroll to section */
+}
+
+@media (max-width: 768px) {
+  .features {
+    padding: 60px 0;
+    scroll-margin-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .features {
+    padding: 50px 0;
+  }
 }
 
 .section-header {
@@ -397,11 +565,29 @@ body {
   transition: all 0.3s ease;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--bg-gray);
+  cursor: pointer;
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-lg);
+}
+
+.feature-card:active {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .feature-card {
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
 }
 
 .feature-icon {
@@ -436,6 +622,20 @@ body {
 .download-section {
   padding: 100px 0;
   background: var(--bg-white);
+  scroll-margin-top: 80px;
+}
+
+@media (max-width: 768px) {
+  .download-section {
+    padding: 60px 0;
+    scroll-margin-top: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .download-section {
+    padding: 50px 0;
+  }
 }
 
 .download-card {
@@ -493,6 +693,7 @@ body {
 .btn-download-large {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   padding: 20px 40px;
   background: white;
@@ -505,6 +706,9 @@ body {
   transition: all 0.3s ease;
   box-shadow: var(--shadow-lg);
   margin-bottom: 16px;
+  min-height: 64px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .btn-download-large:hover {
@@ -512,9 +716,31 @@ body {
   box-shadow: var(--shadow-xl);
 }
 
+.btn-download-large:active {
+  transform: translateY(-2px);
+}
+
 .btn-download-large:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .btn-download-large {
+    font-size: 18px;
+    padding: 18px 32px;
+    min-height: 56px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-download-large {
+    font-size: 16px;
+    padding: 16px 28px;
+    min-height: 52px;
+  }
 }
 
 .download-note {
@@ -615,81 +841,227 @@ body {
 /* Responsive Design */
 @media (max-width: 768px) {
   .nav-container {
-    padding: 0 16px;
-  }
-
-  .download-btn-nav {
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: 0 20px;
   }
 
   .hero {
-    padding: 100px 16px 60px;
+    padding: 100px 20px 60px;
   }
 
   .hero-buttons {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .btn-primary,
-  .btn-secondary {
+    gap: 12px;
     width: 100%;
-    justify-content: center;
   }
 
   .hero-stats {
     gap: 32px;
+    margin-top: 20px;
   }
 
-  .features {
-    padding: 60px 0;
+  .stat-number {
+    font-size: 28px;
+  }
+
+  .stat-label {
+    font-size: 12px;
   }
 
   .features-grid {
     grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .download-section {
-    padding: 60px 0;
+    gap: 20px;
   }
 
   .download-card {
     grid-template-columns: 1fr;
-    padding: 40px 24px;
-    gap: 40px;
+    padding: 32px 20px;
+    gap: 32px;
+    border-radius: 24px;
+  }
+
+  .download-content {
+    text-align: center;
   }
 
   .phone-mockup {
-    width: 200px;
-    height: 400px;
+    width: 220px;
+    height: 440px;
+    margin: 0 auto;
+  }
+
+  .footer {
+    padding: 50px 0 24px;
   }
 
   .footer-content {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
+    text-align: center;
   }
 
-  .container {
-    padding: 0 16px;
+  .footer-brand {
+    text-align: center;
+  }
+
+  .footer-description {
+    max-width: 100%;
+    margin: 0 auto;
   }
 }
 
 @media (max-width: 480px) {
+  .navbar {
+    padding: 12px 0;
+  }
+
+  .nav-container {
+    padding: 0 16px;
+  }
+
+  .hero {
+    padding: 90px 16px 50px;
+  }
+
   .hero-title {
-    font-size: 32px;
+    font-size: 28px;
+    line-height: 1.2;
+    padding: 0 8px;
+  }
+
+  .hero-badge {
+    font-size: 12px;
+    padding: 6px 16px;
   }
 
   .hero-description {
-    font-size: 16px;
+    font-size: 15px;
+    padding: 0 4px;
+  }
+
+  .hero-buttons {
+    gap: 10px;
+  }
+
+  .hero-stats {
+    gap: 20px;
+    flex-direction: column;
+  }
+
+  .stat-number {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .section-header {
+    margin-bottom: 40px;
   }
 
   .section-title {
-    font-size: 28px;
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .section-description {
+    font-size: 16px;
+  }
+
+  .feature-card {
+    padding: 24px 16px;
+  }
+
+  .feature-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    min-height: 60px;
+  }
+
+  .feature-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .feature-description {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .download-card {
+    padding: 24px 16px;
+    border-radius: 20px;
   }
 
   .download-title {
-    font-size: 28px;
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .download-description {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .phone-mockup {
+    width: 180px;
+    height: 360px;
+  }
+
+  .footer {
+    padding: 40px 0 20px;
+  }
+
+  .footer-content {
+    gap: 24px;
+  }
+
+  .footer-column h4 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .footer-column a {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 24px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-download-large {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  .download-title {
+    font-size: 22px;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: 80px 20px 40px;
+  }
+
+  .hero-title {
+    font-size: 32px;
   }
 }
