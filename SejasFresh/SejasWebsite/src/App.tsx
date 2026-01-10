@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import './App.css'
 
-// Direct APK download URL - Google Drive direct download link
-// Converted from: https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link
-const DIRECT_APK_URL = 'https://drive.google.com/uc?export=download&id=1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0'
+// Google Drive file ID for direct download
+const GOOGLE_DRIVE_FILE_ID = '1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0'
 
-// Expo build page URL (fallback)
+// Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
 
 function App() {
@@ -51,36 +50,59 @@ function App() {
     }
   ]
 
-  // Handle direct APK download
+  // Handle direct APK download - no redirects, immediate download
   const handleDownload = async () => {
     setLoading(true)
     try {
-      // For Google Drive, we need to handle it differently
-      // Google Drive direct download format: https://drive.google.com/uc?export=download&id=FILE_ID
-      const downloadUrl = DIRECT_APK_URL
+      // Use Google Drive direct download with confirm parameter to bypass virus scan warning
+      const directDownloadUrl = `https://drive.google.com/uc?export=download&id=${GOOGLE_DRIVE_FILE_ID}&confirm=t`
       
-      // Create a temporary anchor element to trigger download
+      // Fetch the file as a blob for direct download
+      const response = await fetch(directDownloadUrl, {
+        method: 'GET',
+        mode: 'cors',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch APK')
+      }
+      
+      // Convert response to blob
+      const blob = await response.blob()
+      
+      // Create a blob URL and trigger download
+      const blobUrl = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = downloadUrl
-      link.download = 'SejasFresh.apk' // Set the filename for download
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
+      link.href = blobUrl
+      link.download = 'SejasFresh.apk'
+      link.style.display = 'none'
       
       // Append to body, click, and remove
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
       
-      // For Google Drive, sometimes it redirects, so we also open in a new tab as backup
-      // This ensures the user can download even if the direct link doesn't work
+      // Clean up blob URL after a delay
       setTimeout(() => {
-        // Open the original Google Drive link as fallback
-        window.open('https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link', '_blank')
-      }, 1000)
+        window.URL.revokeObjectURL(blobUrl)
+      }, 100)
+      
     } catch (error) {
       console.error('Error downloading APK:', error)
-      // Fallback: Open the Google Drive link
-      window.open('https://drive.google.com/file/d/1TgbLa_Z5iR5pbhw3wvC6Sp4qw2s7osv0/view?usp=drive_link', '_blank')
+      // If fetch fails, try direct link download as fallback
+      try {
+        const directLink = `https://drive.google.com/uc?export=download&id=${GOOGLE_DRIVE_FILE_ID}&confirm=t`
+        const link = document.createElement('a')
+        link.href = directLink
+        link.download = 'SejasFresh.apk'
+        link.target = '_self'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      } catch (fallbackError) {
+        console.error('Fallback download also failed:', fallbackError)
+        alert('Download failed. Please try again or contact support.')
+      }
     } finally {
       setLoading(false)
     }
