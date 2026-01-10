@@ -56,45 +56,53 @@ function App() {
   const handleDownload = async () => {
     setLoading(true)
     try {
-      // GitHub Releases provides direct download links - fetch as blob for reliable download
+      // Method 1: Try fetching with redirect handling
+      // Fetch as blob for direct download
       const response = await fetch(APK_DOWNLOAD_URL, {
         method: 'GET',
-        mode: 'cors',
+        redirect: 'follow',
+        headers: {
+          'Accept': 'application/vnd.android.package-archive, application/octet-stream, */*'
+        }
       })
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch APK: ${response.status} ${response.statusText}`)
+      if (response.ok && response.headers.get('content-type')?.includes('application')) {
+        const blob = await response.blob()
+        const blobUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = blobUrl
+        link.download = 'Sejas.Fresh.apk'
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100)
+        setLoading(false)
+        return
       }
       
-      // Convert response to blob
-      const blob = await response.blob()
-      
-      // Create a blob URL and trigger download
-      const blobUrl = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = blobUrl
-      link.download = 'Sejas.Fresh.apk'
-      link.style.display = 'none'
-      
-      // Append to body, click, and remove
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      
-      // Clean up blob URL after a delay
-      setTimeout(() => {
-        window.URL.revokeObjectURL(blobUrl)
-      }, 100)
+      throw new Error('Blob fetch not available')
       
     } catch (error) {
-      console.error('Error downloading APK:', error)
-      // Fallback: Open GitHub release page if blob download fails
-      try {
-        window.open('https://github.com/prabii/SejasFresh/releases/tag/Sejas', '_blank')
-      } catch (fallbackError) {
-        console.error('Fallback also failed:', fallbackError)
-        alert('Download failed. Please visit the GitHub release page to download manually.')
-      }
+      console.log('Blob method failed, using direct download:', error)
+      
+      // Method 2: Use window.location for direct download (forces download, not redirect)
+      // This is the most reliable method for GitHub Releases
+      const link = document.createElement('a')
+      link.href = APK_DOWNLOAD_URL
+      link.download = 'Sejas.Fresh.apk'
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      
+      // Force download by clicking
+      link.click()
+      
+      // Remove link after click
+      setTimeout(() => {
+        if (link.parentNode) {
+          document.body.removeChild(link)
+        }
+      }, 100)
     } finally {
       setLoading(false)
     }
