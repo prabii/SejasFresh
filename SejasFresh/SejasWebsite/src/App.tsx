@@ -14,32 +14,38 @@ function App() {
   // Features of the app
   const features = [
     {
-      icon: '🥩',
+      icon: '/images/icon.png',
+      iconType: 'image',
       title: 'Fresh Meat Delivery',
       description: 'Get premium quality fresh meat delivered right to your doorstep'
     },
     {
-      icon: '⚡',
+      icon: '/images/bike-delivery.png',
+      iconType: 'image',
       title: 'Fast Delivery',
       description: 'Quick and reliable delivery service to ensure freshness'
     },
     {
       icon: '📱',
+      iconType: 'emoji',
       title: 'Easy Ordering',
       description: 'Simple and intuitive interface for seamless ordering experience'
     },
     {
       icon: '🎯',
+      iconType: 'emoji',
       title: 'Track Orders',
       description: 'Real-time order tracking to know exactly when your order arrives'
     },
     {
       icon: '💳',
+      iconType: 'emoji',
       title: 'Secure Payment',
       description: 'Multiple payment options with secure and encrypted transactions'
     },
     {
       icon: '🎁',
+      iconType: 'emoji',
       title: 'Exclusive Offers',
       description: 'Special discounts and coupons for regular customers'
     }
@@ -86,7 +92,7 @@ function App() {
       <nav className="navbar">
         <div className="nav-container">
           <div className="logo">
-            <span className="logo-icon">🥩</span>
+            <img src="/images/sejas-logo.png" alt="Sejas Fresh" className="logo-image" />
             <span className="logo-text">Sejas Fresh</span>
           </div>
           <button className="download-btn-nav" onClick={handleDownload} disabled={loading}>
@@ -98,6 +104,8 @@ function App() {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-background">
+          <img src="/images/landing-screen-bg.jpg" alt="Background" className="hero-bg-image" />
+          <div className="gradient-overlay"></div>
           <div className="gradient-orb orb-1"></div>
           <div className="gradient-orb orb-2"></div>
           <div className="gradient-orb orb-3"></div>
@@ -176,7 +184,13 @@ function App() {
           <div className="features-grid">
             {features.map((feature, index) => (
               <div key={index} className="feature-card">
-                <div className="feature-icon">{feature.icon}</div>
+                <div className="feature-icon">
+                  {feature.iconType === 'image' ? (
+                    <img src={feature.icon} alt={feature.title} className="feature-image" />
+                  ) : (
+                    <span>{feature.icon}</span>
+                  )}
+                </div>
                 <h3 className="feature-title">{feature.title}</h3>
                 <p className="feature-description">{feature.description}</p>
               </div>
@@ -226,9 +240,12 @@ function App() {
               <div className="phone-mockup">
                 <div className="phone-screen">
                   <div className="app-preview">
-                    <div className="app-header">Sejas Fresh</div>
+                    <div className="app-header">
+                      <img src="/images/sejas-logo.png" alt="Sejas Fresh" className="app-header-logo" />
+                      <span>Sejas Fresh</span>
+                    </div>
                     <div className="app-content">
-                      <div className="preview-item"></div>
+                      <img src="/images/banner-2.jpg" alt="App Preview" className="app-preview-image" />
                       <div className="preview-item"></div>
                       <div className="preview-item"></div>
                     </div>
@@ -246,7 +263,7 @@ function App() {
           <div className="footer-content">
             <div className="footer-brand">
               <div className="logo">
-                <span className="logo-icon">🥩</span>
+                <img src="/images/sejas-logo.png" alt="Sejas Fresh" className="logo-image" />
                 <span className="logo-text">Sejas Fresh</span>
               </div>
               <p className="footer-description">
