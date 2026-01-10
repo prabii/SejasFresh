@@ -186,14 +186,18 @@ function App() {
                 </>
               )}
             </button>
-            <a 
-              href={EXPO_BUILD_URL} 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <button 
               className="btn-secondary"
+              onClick={() => {
+                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
-              View on Expo
-            </a>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              Learn More
+            </button>
           </div>
           <div className="hero-stats">
             <div className="stat-item">
@@ -213,7 +217,7 @@ function App() {
       </section>
 
       {/* Features Section */}
-      <section className="features">
+      <section id="features" className="features">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Why Choose Sejas Fresh?</h2>
