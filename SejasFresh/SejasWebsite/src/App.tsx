@@ -1,27 +1,10 @@
 import { useState } from 'react'
 import './App.css'
 
-// APK Download URL - Use direct link from hosting service
-// 
-// 🚀 RECOMMENDED OPTIONS (All support direct download, no redirects):
-//
-// Option 1: GitHub Releases (BEST - Free, Fast, Reliable)
-//   1. Create release: https://github.com/prabii/SejasFresh/releases/new
-//   2. Upload APK file
-//   3. Copy download URL and paste below
-//   Example: 'https://github.com/prabii/SejasFresh/releases/download/v1.0.0/SejasFresh.apk'
-//
-// Option 2: Host in Website Public Folder
-//   1. Place APK in: public/SejasFresh.apk
-//   2. Use: '/SejasFresh.apk'
-//
-// Option 3: Cloudflare R2 / AWS S3 / Firebase Hosting
-//   Use direct CDN URL
-//
-// ⚠️ NOT RECOMMENDED: Google Drive (shows virus scan warnings)
-//
-// UPDATE THIS URL with your chosen hosting option:
-const APK_DOWNLOAD_URL = '/SejasFresh.apk' // Change to your direct download URL
+// APK Download URL - GitHub Releases Direct Download
+// Using GitHub Releases for instant, reliable downloads with no redirects
+// Release: https://github.com/prabii/SejasFresh/releases/tag/Sejas
+const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/SejasFresh.apk'
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
@@ -69,32 +52,18 @@ function App() {
     }
   ]
 
-  // Handle direct APK download - instant download, no redirects, no warnings
+  // Handle direct APK download - GitHub Releases direct download
   const handleDownload = async () => {
     setLoading(true)
     try {
-      // Try direct download from website first (fastest, no warnings)
-      if (APK_DOWNLOAD_URL.startsWith('/')) {
-        // Local file from public folder
-        const link = document.createElement('a')
-        link.href = APK_DOWNLOAD_URL
-        link.download = 'SejasFresh.apk'
-        link.style.display = 'none'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        setLoading(false)
-        return
-      }
-      
-      // If using external URL, fetch as blob for direct download
+      // GitHub Releases provides direct download links - fetch as blob for reliable download
       const response = await fetch(APK_DOWNLOAD_URL, {
         method: 'GET',
         mode: 'cors',
       })
       
       if (!response.ok) {
-        throw new Error('Failed to fetch APK')
+        throw new Error(`Failed to fetch APK: ${response.status} ${response.statusText}`)
       }
       
       // Convert response to blob
@@ -119,8 +88,13 @@ function App() {
       
     } catch (error) {
       console.error('Error downloading APK:', error)
-      // Show user-friendly error message
-      alert('Download failed. Please ensure the APK file is available. If the problem persists, contact support.')
+      // Fallback: Open GitHub release page if blob download fails
+      try {
+        window.open('https://github.com/prabii/SejasFresh/releases/tag/Sejas', '_blank')
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError)
+        alert('Download failed. Please visit the GitHub release page to download manually.')
+      }
     } finally {
       setLoading(false)
     }
