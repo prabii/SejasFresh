@@ -17,8 +17,18 @@ import { orderService } from '../services/orderService';
 import { clearAllCache, getCacheInfo } from '../utils/cacheManager';
 import { useToast } from './ui/ToastProvider';
 
+// Enhanced color palette
 const RED_COLOR = '#D13635';
-const LIGHT_GRAY = '#f5f5f5';
+const RED_LIGHT = '#FFEBEE';
+const RED_DARK = '#B71C1C';
+const LIGHT_GRAY = '#F8F9FA';
+const MEDIUM_GRAY = '#E9ECEF';
+const DARK_GRAY = '#212529';
+const TEXT_PRIMARY = '#1A1A1A';
+const TEXT_SECONDARY = '#6C757D';
+const TEXT_LIGHT = '#ADB5BD';
+const WHITE = '#FFFFFF';
+const SHADOW_COLOR = '#000000';
 
 // Mock data for profile menu items
 const profileMenuData = [
@@ -559,31 +569,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 16,
     backgroundColor: 'white',
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   backButton: {
     padding: 8,
+    borderRadius: 12,
+    backgroundColor: '#F8F9FA',
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 22,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    letterSpacing: 0.5,
   },
 
   editText: {
     fontSize: 16,
     color: RED_COLOR,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 
   // Content Styles
   content: {
     flex: 1,
+    backgroundColor: LIGHT_GRAY,
   },
 
   scrollContent: {
@@ -595,14 +619,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginHorizontal: 20,
     marginTop: 20,
-    borderRadius: 15,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
 
   profileImageContainer: {
@@ -611,18 +637,26 @@ const styles = StyleSheet.create({
   },
 
   profileInitials: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: RED_COLOR,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: RED_COLOR,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
 
   initialsText: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 36,
+    fontWeight: '700',
     color: 'white',
+    letterSpacing: 1,
   },
 
   profileImage: {
@@ -637,22 +671,25 @@ const styles = StyleSheet.create({
   },
 
   profileName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
+    fontSize: 24,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 8,
+    letterSpacing: 0.5,
   },
 
   profileEmail: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 2,
+    fontSize: 15,
+    color: TEXT_SECONDARY,
+    marginBottom: 4,
+    fontWeight: '500',
   },
 
   profilePhone: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 15,
+    color: TEXT_SECONDARY,
     marginBottom: 2,
+    fontWeight: '500',
   },
 
   profileAddress: {
@@ -685,15 +722,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'white',
     marginHorizontal: 20,
-    marginTop: 15,
-    borderRadius: 15,
-    padding: 20,
+    marginTop: 20,
+    borderRadius: 18,
+    padding: 24,
     justifyContent: 'space-around',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
 
   statItem: {
@@ -702,16 +741,19 @@ const styles = StyleSheet.create({
   },
 
   statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '700',
     color: RED_COLOR,
-    marginBottom: 4,
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
 
   statLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 
   statDivider: {
@@ -727,20 +769,24 @@ const styles = StyleSheet.create({
   },
 
   menuSectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
+    fontSize: 20,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
 
   menuList: {
     backgroundColor: 'white',
-    borderRadius: 15,
+    borderRadius: 18,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    overflow: 'hidden',
   },
 
   menuItem: {
@@ -748,9 +794,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#F5F5F5',
   },
 
   lastMenuItem: {
@@ -764,13 +810,18 @@ const styles = StyleSheet.create({
   },
 
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: LIGHT_GRAY,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: RED_LIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   logoutIconContainer: {
@@ -779,8 +830,9 @@ const styles = StyleSheet.create({
 
   menuItemTitle: {
     fontSize: 16,
-    color: '#333',
-    fontWeight: '500',
+    color: TEXT_PRIMARY,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 
   logoutTitle: {

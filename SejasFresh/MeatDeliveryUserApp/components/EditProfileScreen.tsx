@@ -15,9 +15,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../contexts/AuthContext';
 
 // Color constants
-const PRIMARY_RED = '#D32F2F';
-const LIGHT_GRAY = '#F5F5F5';
-const DARK_GRAY = '#333';
+const PRIMARY_RED = '#D13635';
+const RED_LIGHT = '#FFEBEE';
+const LIGHT_GRAY = '#F8F9FA';
+const MEDIUM_GRAY = '#E9ECEF';
+const DARK_GRAY = '#212529';
+const TEXT_PRIMARY = '#1A1A1A';
+const TEXT_SECONDARY = '#6C757D';
 const LIGHT_PINK = '#FFF1F1';
 
 interface FormData {
@@ -336,37 +340,53 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    height: 60,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    height: 64,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: LIGHT_PINK,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: RED_LIGHT,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
+    fontSize: 22,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
 
   saveButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
     backgroundColor: PRIMARY_RED,
-    minWidth: 60,
+    minWidth: 70,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: PRIMARY_RED,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   saveButtonDisabled: {
@@ -376,7 +396,8 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 
   // Content Styles
@@ -389,53 +410,81 @@ const styles = StyleSheet.create({
   profilePictureSection: {
     backgroundColor: 'white',
     alignItems: 'center',
-    padding: 30,
-    marginBottom: 16,
+    padding: 32,
+    marginBottom: 20,
+    marginHorizontal: 16,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
 
   profileInitials: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: PRIMARY_RED,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 20,
+    shadowColor: PRIMARY_RED,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
 
   initialsText: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 36,
+    fontWeight: '700',
     color: 'white',
+    letterSpacing: 1,
   },
 
   profilePictureText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: DARK_GRAY,
-    marginBottom: 4,
+    fontSize: 20,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 6,
+    letterSpacing: 0.5,
   },
 
   profilePictureSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
     textAlign: 'center',
+    fontWeight: '500',
+    lineHeight: 20,
   },
 
   // Form Section
   formSection: {
     backgroundColor: 'white',
     marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 12,
-    padding: 20,
+    marginBottom: 20,
+    borderRadius: 18,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
   },
 
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: DARK_GRAY,
-    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 24,
+    letterSpacing: 0.5,
   },
 
   inputGroup: {
@@ -454,26 +503,29 @@ const styles = StyleSheet.create({
   },
 
   inputLabel: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: DARK_GRAY,
-    marginBottom: 8,
+    color: TEXT_PRIMARY,
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
 
   textInput: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     fontSize: 16,
-    color: DARK_GRAY,
+    color: TEXT_PRIMARY,
     backgroundColor: 'white',
+    fontWeight: '500',
   },
 
   readOnlyInput: {
-    backgroundColor: '#F8F8F8',
-    color: '#999',
+    backgroundColor: LIGHT_GRAY,
+    color: TEXT_SECONDARY,
+    borderColor: MEDIUM_GRAY,
   },
 
   readOnlyText: {
@@ -485,6 +537,7 @@ const styles = StyleSheet.create({
 
   inputError: {
     borderColor: PRIMARY_RED,
+    borderWidth: 2,
   },
 
   errorText: {
@@ -495,18 +548,21 @@ const styles = StyleSheet.create({
 
   // Info Section
   infoSection: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFF9E6',
     marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 12,
+    marginBottom: 20,
+    borderRadius: 16,
     padding: 20,
+    borderWidth: 1,
+    borderColor: '#FFE082',
   },
 
   infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: DARK_GRAY,
-    marginBottom: 8,
+    fontSize: 17,
+    fontWeight: '700',
+    color: TEXT_PRIMARY,
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
 
   infoText: {
