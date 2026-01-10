@@ -239,17 +239,7 @@ function App() {
             <div className="download-visual">
               <div className="phone-mockup">
                 <div className="phone-screen">
-                  <div className="app-preview">
-                    <div className="app-header">
-                      <img src="/images/sejas-logo.png" alt="Sejas Fresh" className="app-header-logo" />
-                      <span>Sejas Fresh</span>
-                    </div>
-                    <div className="app-content">
-                      <img src="/images/banner-2.jpg" alt="App Preview" className="app-preview-image" />
-                      <div className="preview-item"></div>
-                      <div className="preview-item"></div>
-                    </div>
-                  </div>
+                  <img src="/images/app-screenshot.png" alt="Sejas Fresh App" className="app-screenshot" />
                 </div>
               </div>
             </div>

@@ -551,55 +551,15 @@ body {
   border-radius: 30px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  position: relative;
 }
 
-.app-preview {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.app-header {
-  background: var(--gradient-1);
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-weight: 700;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.app-header-logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.app-content {
-  flex: 1;
-  padding: 20px;
-  background: var(--bg-light);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.app-preview-image {
+.app-screenshot {
   width: 100%;
-  height: 120px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
-}
-
-.preview-item {
-  height: 60px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
+  object-position: top;
+  display: block;
 }
 
 /* Footer */
