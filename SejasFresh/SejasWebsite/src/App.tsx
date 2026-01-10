@@ -4,8 +4,15 @@ import './App.css'
 // APK Download URL - GitHub Releases Direct Download
 // Using GitHub Releases for instant, reliable downloads with no redirects
 // Release: https://github.com/prabii/SejasFresh/releases/tag/Sejas
-// If redirecting, try: SejasAPP or check the actual tag name in GitHub
-const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/Sejas/Sejas.Fresh.apk'
+// 
+// IMPORTANT: If download redirects, check the actual tag name:
+// 1. Go to: https://github.com/prabii/SejasFresh/releases
+// 2. Click on your release
+// 3. Right-click the APK file → "Copy link address"
+// 4. Use that exact URL below
+//
+// Common tag names: "Sejas", "SejasAPP", "v1.0.0"
+const APK_DOWNLOAD_URL = 'https://github.com/prabii/SejasFresh/releases/download/SejasAPP/Sejas.Fresh.apk'
 
 // Expo build page URL (for reference)
 const EXPO_BUILD_URL = 'https://expo.dev/accounts/prabii/projects/MeatDeliveryUserApp/builds/ce7cf39e-12d0-455c-8118-35f29183834d'
